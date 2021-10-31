@@ -1,0 +1,129 @@
+﻿<!--@layout(/layout/basic/main.html)-->
+
+
+
+<div moduel="layout_logincheck">
+    <!--
+        // 변수에 주소가 있는경우 입력한 주소로이동
+        $url = /member/login.html
+    -->
+</div>
+
+<!-- 추천상품 -->
+<div><img src="/web/upload/good_mobile_img/best_item_title.gif" width="100%"></div>
+<div class="mPrdList typeThumb" module="product_listmain_1">
+    <!--@css(/css/module/product/listmain_1.css)-->
+    <!--
+        $count = 10
+        $moreview = yes
+    -->
+    <ul class="grid2">
+        <li>
+            <div class="thumbnail"><a href="/product/detail.html{$param}"><img src="{$image_medium}" alt="{$seo_alt_tag}"></a></div>
+            <div class="information">
+                <p class="name {$product_name_display|display}"><a href="/product/detail.html{$param}">{$product_name}</a></p>
+                <p class="price display_custom{$product_custom}"><strike>{$disp_product_custom}</strike></p>
+                <p class="price {$product_price_display|display} {$product_sale_strike}"><b>{$disp_product_price}</b><span class="{$product_price_ref_display|display}">{$txt_product_price_ref}</span></p>
+                <p class="price {$product_sale_display|display}">{$product_sale_price}</p>
+                <p class="icon">{$soldout_icon} {$stock_icon} {$new_icon} {$recommend_icon} {$product_icons}</p>
+                <div class="{$colorchip_display|display}">
+                    <div class="color" module="product_Colorchip">
+                        <span class="chips" style="background-color:{$color};"></span>
+                        <span class="chips" style="background-color:{$color};"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="thumbnail"><a href="/product/detail.html{$param}"><img src="{$image_medium}" alt="{$seo_alt_tag}"></a></div>
+            <div class="information">
+                <p class="name {$product_name_display|display}"><a href="/product/detail.html{$param}">{$product_name}</a></p>
+                <p class="price display_custom{$product_custom}"><strike>{$disp_product_custom}</strike></p>
+                <p class="price {$product_price_display|display} {$product_sale_strike}"><b>{$disp_product_price}</b><span class="{$product_price_ref_display|display}">{$txt_product_price_ref}</span></p>
+                <p class="price {$product_sale_display|display}">{$product_sale_price}</p>
+                <p class="icon">{$soldout_icon} {$stock_icon} {$new_icon} {$recommend_icon} {$product_icons}</p>
+                <div class="{$colorchip_display|display}">
+                    <div class="color" module="product_Colorchip">
+                        <span class="chips" style="background-color:{$color};"></span>
+                        <span class="chips" style="background-color:{$color};"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div module="product_listmore_1" class="paginate typeMoreview">
+    <a href="#none" onclick="{$more_action}">
+        더보기(<span id="more_current_page_{$display_group}">{$current_page}</span>/<span id="more_total_page_{$display_group}">{$total_page}</span>)
+        <span class="icoMore"></span>
+    </a>
+</div>
+<!-- // 추천상품 -->
+
+<!-- 신상품 -->
+<div><img src="/web/upload/good_mobile_img/new_item_title.gif" width="100%"></div>
+<div class="mPrdList typeThumb" module="product_listmain_2">
+    <!--@css(/css/module/product/listmain_2.css)-->
+    <!--
+        $count = 10
+        $moreview = yes
+    -->
+    <ul class="grid2">
+        <li>
+            <div class="thumbnail"><a href="/product/detail.html{$param}"><img src="{$image_medium}" alt="{$seo_alt_tag}"></a></div>
+            <div class="information">
+                <p class="name {$product_name_display|display}"><a href="/product/detail.html{$param}">{$product_name}</a></p>
+                <p class="price display_custom{$product_custom}"><strike>{$disp_product_custom}</strike></p>
+                <p class="price {$product_price_display|display} {$product_sale_strike}"><b>{$disp_product_price}</b><span class="{$product_price_ref_display|display}">{$txt_product_price_ref}</span></p>
+                <p class="price {$product_sale_display|display}">{$product_sale_price}</p>
+                <p class="icon">{$soldout_icon} {$stock_icon} {$new_icon} {$recommend_icon} {$product_icons}</p>
+                <div class="{$colorchip_display|display}">
+                    <div class="color" module="product_Colorchip">
+                        <span class="chips" style="background-color:{$color};"></span>
+                        <span class="chips" style="background-color:{$color};"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="thumbnail"><a href="/product/detail.html{$param}"><img src="{$image_medium}" alt="{$seo_alt_tag}"></a></div>
+            <div class="information">
+                <p class="name {$product_name_display|display}"><a href="/product/detail.html{$param}">{$product_name}</a></p>
+                <p class="price display_custom{$product_custom}"><strike>{$disp_product_custom}</strike></p>
+                <p class="price {$product_price_display|display} {$product_sale_strike}"><b>{$disp_product_price}</b><span class="{$product_price_ref_display|display}">{$txt_product_price_ref}</span></p>
+                <p class="price {$product_sale_display|display}">{$product_sale_price}</p>
+                <p class="icon">{$soldout_icon} {$stock_icon} {$new_icon} {$recommend_icon} {$product_icons}</p>
+                <div class="{$colorchip_display|display}">
+                    <div class="color" module="product_Colorchip">
+                        <span class="chips" style="background-color:{$color};"></span>
+                        <span class="chips" style="background-color:{$color};"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div module="product_listmore_2" class="paginate typeMoreview">
+    <a href="#none" onclick="{$more_action}">
+        더보기(<span id="more_current_page_{$display_group}">{$current_page}</span>/<span id="more_total_page_{$display_group}">{$total_page}</span>)
+        <span class="icoMore"></span>
+    </a>
+</div>
+<!-- // 신상품 -->
+
+
+
+
+
+
+
+
+ 
+<p module="Layout_attendBanner">
+<!--@css(/css/module/layout/attendBanner.css)-->
+    <!--
+        $stamp_type_url = /attend/stamp.html
+        $comment_type_url = /attend/comment.html
+    -->
+    <a href="{$attend_url}"><img src="http://img.echosting.cafe24.com/skin/mobile_ko_KR/layout/bnr_attend.png" alt="출석체크 이벤트(매일매일 출석도장 쾅쾅쾅!)"></a>
+</p>

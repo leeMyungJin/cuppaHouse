@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="euc-kr">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0, user-scalable=yes, shrink-to-fit=no">
+    <title></title>
+    <!--@css(/layout/basic/css/common.css)-->
+    <!--@css(/layout/basic/css/layout.css)-->
+    <!--@css(/layout/basic/css/button.css)-->
+    <!--@css(/layout/basic/css/paginate.css)-->
+
+    <!-- 스마트디자인에서는 JQuery 1.4.4 버전이 내장되어있습니다. 추가로 호출하면 충돌이 생길 수 있습니다. -->
+    <!--@js(/layout/basic/js/common.js)-->
+</head>
+<body id="main">
+    <div module="Popup_Mobile">{$mobile}</div>
+    <div id="wrap">
+        <!--@import(/layout/basic/sidebar.html)-->
+        <hr class="layout">
+        <div id="container">
+            <header id="header">
+                <div class="header">
+					<!--@import(/layout/basic/navigation.html)-->
+                </div>
+                    <section id="topArea">
+					<!--@import(/layout/basic/header.html)-->
+                        
+						
+                    </section>
+            </header>
+
+				
+
+<hr class="layout">
+            <div id="contents">
+                <!--@contents-->
+            </div>
+            <hr class="layout">
+            <!--@import(/layout/basic/footer.html)-->
+        </div>
+    </div>
+</body>
+</html>

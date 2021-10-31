@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.MemberMapper">
+
+	<select id="getMemberTotal" resultType="hashMap">
+		select coalesce(sum(case when auth = 'admin' then 1 else 0 end ), 0) as adminTotal
+				, coalesce(sum(case when auth != 'admin' then 1 else 0 end ), 0) as nonAdminTotal
+		from web."member"
+	</select>	
+
+	<select id="getMemberList" parameterType="hashMap" resultType="MemberVo">
+		select id
+			   , pass
+			   , name
+			   , pnum
+			   , memo
+			   , active_yn
+			   , position
+			   , dept
+			   , auth
+			   , to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			   , cret_id
+			   , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			   , updt_id
+			   , to_char(lateass_dt, 'YYYY-MM-DD') as lateass_dt 
+			   , bldg_cd
+		from web.member 
+		where 1=1		
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'name'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						name LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'id'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						id LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						name LIKE '%' || #{item} || '%'
+						or id LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		order by cret_dt
+	</select>	
+	
+	<select id="getMemberInfo" parameterType="MemberVo" resultType="MemberVo">
+		select id
+			   , pass
+			   , name
+			   , pnum
+			   , memo
+			   , active_yn
+			   , position
+			   , dept
+			   , auth
+			   , to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			   , cret_id
+			   , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			   , updt_id
+			   , to_char(lateass_dt, 'YYYY-MM-DD') as lateass_dt 
+		from web.member 
+		where 1=1		
+		and id = #{id}
+	</select>	
+	
+	<select id="dupCheckId" parameterType="hashMap" resultType="String">
+		select id
+		from web.member
+		where id=#{id}
+	</select>
+
+	<insert id="saveNewMember" parameterType="hashMap">
+		INSERT INTO web.Member
+			(id
+			   , pass
+			   , name
+			   , pnum
+			   , memo
+			   , position
+			   , dept
+			   , auth
+			   , password_key
+			   , cret_dt
+			   , cret_id
+			   , bldg_cd
+			)VALUES(
+				#{id}
+			   , #{pass}
+			   , #{name}
+			   , #{pnum}
+			   , #{memo}
+			   , #{position}
+			   , #{dept}
+			   , #{auth}
+			   , #{passwordKey}
+			   , NOW()
+			   , #{cretId}
+			   , #{bldgCd}
+			)
+	</insert>
+	
+	<delete id="deleteMember" parameterType="hashMap">
+		delete from web.member
+		where id=#{id}
+	</delete>
+	
+	<update id="updateMember" parameterType="hashMap">
+		UPDATE web.member SET 
+	   		<if test="password != null and password != ''">
+	   	   		pass=#{password},
+			</if>
+	       name=#{name},
+		   pnum=#{telPhone}, 
+		   memo=#{memo}, 
+		   <choose>
+				<when test="auth == 'admin' or auth == 'own'">
+					position=#{position},
+		   	  		dept=#{dept},
+				</when>
+				<otherwise>
+					position = null,
+		   			dept = null,
+				</otherwise>
+			</choose>
+		   auth=#{auth},
+		   active_yn=#{active}::bool, 
+		   updt_dt=NOW(),
+		   updt_id=#{updtId},
+		   bldg_cd=#{bldgCd}
+		WHERE id=#{id}
+	</update>
+	
+	<select id="getAppVersion" resultType="MemberVo">
+	select appversion from app.appver_check
+	</select>
+	
+	<update id="saveAppVersion" parameterType="MemberVo">
+	update app.appver_check set
+		appversion = #{appversion}
+	</update>
+	
+	<select id="getChooseMemberList" parameterType="hashMap" resultType="MemberVo">
+	select id, name 
+	from web."member"
+	where active_yn = 'Y'
+	<if test="inq != null">
+		<foreach collection="type" item="item"
+			index="index" open="(" close=")" separator="or">
+			auth = #{item}
+		</foreach>
+	</if>
+	</select>
+	
+</mapper>

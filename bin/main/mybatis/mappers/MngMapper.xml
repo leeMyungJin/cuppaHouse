@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.MngMapper">
+
+	<select id="getMngHistList" parameterType="hashMap" resultType="MngVo">
+	select ib.item_cd 
+			, cd.item_nm 
+			, to_char(ib.sell_dt, 'YYYY-MM-DD') as sell_dt 
+			, ib.prod_cd 
+			, ib.part_cd 
+			, ib.color_cd 
+			, ib.prod_seq 
+			, ib.barcode
+			, ib.barcode as barcode_temp
+			, 'Y' as select_yn
+			, to_char(ib.cret_dt, 'YYYY-MM-DD') as cret_dt 
+	from web.item_barcode ib left join web.category_dtl cd on ib.item_cd = cd.item_cd
+	where 1=1
+	<if test="sellYn != null">
+		and sell_yn = #{sellYn}
+	</if>
+	<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'codeNum'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						ib.barcode LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cd.item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdCd'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						ib.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						ib.barcode LIKE '%' || #{item} || '%'
+						or cd.item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and ib.sell_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+		order by ib.cret_dt desc
+	</select>
+	
+	<update id="deleteMngHist" parameterType="hashMap">
+		update web.item_barcode set
+			sell_dt = null
+			, sell_yn = 'N'
+		where barcode = #{barcodeTemp};
+	</update>
+	
+	<update id="saveMngHist" parameterType="MngVo">
+		update web.item_barcode set
+			sell_dt = now()
+			, sell_yn = 'Y'
+		where barcode = #{barcode}
+	</update>
+	
+	<update id="saveMngHistReset" parameterType="MngVo">
+		update web.item_barcode set
+			sell_dt = null
+			, sell_yn = 'N'
+		where barcode = #{barcodeTemp}
+	</update>
+	
+	<select id="saveMngHistVal" parameterType="MngVo" resultType="MngVo">
+	--바코드 체크( sell_yn가 null 이면 존재하지 않는 바코드, sell_yn이 Y이면 이미 판매 된 바코드, item_cd가 null 이면 존재하지않는 제품 )
+	select (select sell_yn from web.item_barcode where barcode = #{barcode}) as sell_yn 
+		, (select item_cd from web.category_dtl where item_cd = #{itemCd}) as item_cd
+	</select>
+	
+	
+	<delete id="deleteMngProduct" parameterType="MngVo">
+		delete from web.item_barcode 
+		where barcode = #{barcode}
+	</delete>
+	
+	<insert id="saveMngProduct" parameterType="MngVo">
+	insert into web.item_barcode (
+		item_cd
+		, prod_seq 
+		, prod_cd 
+		, part_cd 
+		, barcode 
+		, color_cd 
+		, cret_dt 
+		, cret_id
+	)values(
+		#{itemCd}
+		, #{prodSeq}::numeric
+		, #{prodCd} 
+		, #{partCd} 
+		, #{barcode}
+		, #{colorCd} 
+		, now()
+		, #{cretId}
+	)
+	</insert>
+	
+	<update id="updateMngProduct" parameterType="MngVo">
+		update web.item_barcode set
+			part_cd = #{partCd}
+			, barcode = #{barcode}
+			, updt_dt = now()
+			, updt_id = #{updtId}
+			, prod_cd = #{prodCd}
+			, color_cd = #{colorCd}
+			, prod_seq = #{prodSeq}
+		where barcode = #{barcode}
+	</update>
+	
+	<update id="sellMngProduct" parameterType="MngVo">
+		update web.item_barcode set
+			sell_dt = now(),
+			sell_yn = 'Y'
+		where barcode = #{barcode}
+	</update>
+	
+	<select id="getQrInfo" parameterType="hashMap" resultType="hashMap">
+		--select cd.item_cd, cd.item_nm, coalesce(ib.barcodeCnt, 0) as barcode_cnt
+		--from web.category_dtl cd left join (select item_cd, count(*) as barcodeCnt
+		--									from web.item_barcode 
+		--									group by item_cd) ib on cd.item_cd = ib.item_cd
+		--where cd.item_cd = 
+		
+		select item_cd, item_nm, quantity as barcode_cnt
+		from web.category_dtl
+		where item_cd = #{con}
+	</select>
+	
+	<select id="getBarcodeInfo" parameterType="hashMap" resultType="MngVo">
+		SELECT ib.item_cd
+			, cd.item_nm
+			, ib.part_cd
+			, ib.barcode
+			, ib.sell_yn
+			, to_char(ib.cret_dt, 'YYYY-MM-DD') as cret_dt 
+			, ib.cret_id
+			, ib.updt_dt
+			, ib.updt_id
+			, ib.prod_cd
+			, ib.color_cd
+			, ib.prod_seq
+			, to_char(ib.sell_dt, 'YYYY-MM-DD') as sell_dt 
+		FROM web.item_barcode ib left join web.category_dtl cd on ib.item_cd = cd.item_cd
+		where barcode = #{con}
+	</select>
+	
+	<select id="getTotalMngProductCnt" resultType="hashMap">
+		select coalesce(count(*),0) as totalItemCnt
+			, coalesce(sum(case when ib.barcodeCnt is null then 1 else 0 end),0) as nonBarcodeCnt
+		from web.category_dtl cd left join (select item_cd, count(*) as barcodeCnt
+											from web.item_barcode 
+											group by item_cd) ib on cd.item_cd = ib.item_cd
+	</select>
+	
+	
+	<!-- 매출 -->
+	
+	<select id="getMngIncomeList" parameterType="hashMap" resultType="MngVo">
+	select income_seq
+			, sell_dt
+			, item_nm
+			, sell_amt
+			, sell_cnt
+			, cost
+			, path
+			, cust_nm
+			, memo
+			, to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			, cret_id
+			, to_char(updt_dt, 'YYYY-MM-DD') as updt_dt
+			, updt_id
+	from web.income
+	where 1=1
+	<if test="inq != null">
+		AND 
+		<choose>
+			<when test="con == 'itemNm'">
+				<foreach collection="inq" item="item"
+					index="index" open="(" close=")" separator="or">
+					item_nm LIKE '%' || #{item} || '%'
+				</foreach>
+			</when>
+			<when test="con == 'custNm'">
+				<foreach collection="inq" item="item"
+					index="index" open="(" close=")" separator="or">
+					cust_nm LIKE '%' || #{item} || '%'
+				</foreach>
+			</when>
+			<otherwise>
+				<foreach collection="inq" item="item"
+					index="index" open="(" close=")" separator="or">
+					item_nm LIKE '%' || #{item} || '%'
+					or cust_nm LIKE '%' || #{item} || '%'
+				</foreach>
+			</otherwise>
+		</choose>
+	</if>
+	<if test="fromDate != null and toDate != null">
+		and cret_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+	</if>
+	order by income_seq desc
+	</select>
+	
+	<select id="getTotalMngIncomeCnt" resultType="hashMap">
+		select coalesce(sum(cost), 0) as totalCost
+			, coalesce(sum(sell_cnt), 0) as totalCnt
+		from web.income
+		where extract('YEAR' from cret_dt) = extract('YEAR' from now())
+
+	</select>
+	
+	<select id="getLableMngIncomeCnt" parameterType="hashMap" resultType="hashMap">
+		select coalesce(sum(cost), 0) as lableCost
+			, coalesce(sum(sell_cnt), 0) as lableCnt
+		from web.income
+		where 1=1
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'itemNm'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'custNm'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cust_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						item_nm LIKE '%' || #{item} || '%'
+						or cust_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and cret_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+	</select>
+	
+	<delete id="deleteMngIncome" parameterType="MngVo">
+		delete from web.income 
+		where income_seq = #{incomeSeq}::numeric
+	</delete>
+	
+	<insert id="saveMngIncome" parameterType="MngVo">
+	insert into web.income(
+		sell_dt
+		, item_nm
+		, sell_amt
+		, sell_cnt
+		, cost
+		, path
+		, cust_nm
+		, memo
+		, cret_dt
+		, cret_id
+	)values(
+		#{sellDt}::timestamp
+		, #{itemNm}
+		, #{sellAmt}::numeric
+		, #{sellCnt}::numeric
+		, #{cost}::numeric
+		, #{path}
+		, #{custNm}
+		, #{memo}
+		, now()
+		, #{cretId}
+	)
+	</insert>
+	
+	<update id="updateMngIncome" parameterType="MngVo">
+		update web.income set 
+			sell_dt = #{sellDt}::timestamp
+			, item_nm = #{itemNm}
+			, sell_amt = #{sellAmt}::numeric
+			, sell_cnt = #{sellCnt}::numeric
+			, cost = #{cost}::numeric
+			, path = #{path}
+			, cust_nm = #{custNm}
+			, memo = #{memo}
+			, updt_dt = now()
+			, updt_id = #{updtId}
+		where income_seq = #{incomeSeq}::numeric
+	</update>
+</mapper>

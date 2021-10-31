@@ -1,0 +1,72 @@
+
+
+
+/* grid 관련*/
+.wj-flexgrid {
+	max-height: 620px;
+	height: auto;
+	width: 100%;
+}
+
+.wj-header {
+ 	background: white;
+    text-align : center !important;
+    
+}
+
+.wj-flexgrid .wj-cell {
+    display: flex !important;
+    align-items: center !important;
+}
+.wj-flexgrid .wj-cell.wj-align-right {
+    justify-content: flex-end !important;
+}
+.wj-flexgrid .wj-cell.wj-align-center {
+    justify-content: center !important;
+}
+
+
+
+
+/* tab 관련*/
+.wj-tabpane {
+    padding: 12px;
+}
+
+
+.wj-tabpanel.custom-headers .wj-tabheaders .wj-tabheader {
+  	
+  	border: 1px solid #dddddd;
+}
+
+.wj-tabheader{
+	margin: 1px .2em 0 0 !important;
+	
+}
+
+/*차트관련*/
+
+/* custom size/weight for header*/ 
+.wj-flexchart .wj-header .wj-title {
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.wj-flexchart .wj-footer .wj-title {
+    font-size: 90%;
+    font-weight: bold;
+}
+
+.read-only{
+	background-color:#C0C0C0 !important; 
+}
+
+.float-right{
+	float: right;	
+}
+
+/* 달력관련*/
+.wj-calendar .wj-day-today {
+    font-weight: bold;
+    color: blue;
+}

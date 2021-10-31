@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.LoginMapper">
+
+	<select id="getPassword" parameterType="MemberVo" resultType="MemberVo">
+		select
+			id,
+			pass,
+			password_key
+		from web.member
+		where id = #{id}
+	</select>
+	
+	<update id="updateLoginTime" parameterType = "MemberVo">
+		update web.member set
+		lateass_dt = #{lateassDt}::timestamp
+		where id = #{id}
+	</update>
+	
+	<select id="getUserToken" parameterType="hashMap" resultType="String">
+		select usertoken from web.member where id = #{id}
+	</select>
+	
+	<select id="getMemberInfo" parameterType="MemberVo" resultType="MemberVo">
+		select id
+			   , pass
+			   , name
+			   , pnum
+			   , memo
+			   , active_yn
+			   , position
+			   , dept
+			   , auth
+			   , to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			   , cret_id
+			   , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			   , updt_id
+			   , to_char(lateass_dt, 'YYYY-MM-DD') as lateass_dt 
+		from web.member 
+		where 1=1		
+		and id = #{id}
+	</select>	
+</mapper>

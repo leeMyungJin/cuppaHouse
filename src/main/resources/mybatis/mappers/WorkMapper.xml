@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.WorkMapper">
+
+	<select id="getWorkList" parameterType="hashMap" resultType="WorkVo">
+		select work_st_dt
+			, officer_id 
+			, officer_nm 
+			, late
+			, work_in_dt 
+			, comp_in_nm
+			, comp_in_cd
+			, post_in_loc_nm
+			, work_out_dt 
+			, comp_out_nm
+			, comp_out_cd
+			, post_out_loc_nm
+			, case when (work_in_dt is not null and work_out_dt is not null )
+				   then round( ((extract(epoch from (work_out_dt - work_in_dt))/60)/60)::numeric, 0)
+				   else null end as work_hour
+			, memo_in
+			, memo_out
+			, to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			, cret_id
+			, to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			, updt_id
+		from web.work_list
+		where 1=1		
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'staffName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						officer_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'bldgName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						comp_in_nm LIKE '%' || #{item} || '%'
+						or comp_out_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						officer_nm LIKE '%' || #{item} || '%'
+						or comp_in_nm LIKE '%' || #{item} || '%'
+						or comp_out_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and work_st_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+		order by work_st_dt desc, officer_nm
+	</select>
+	
+	<select id="getWorkLable" resultType="hashMap">
+		select coalesce(count(distinct(work_st_dt)),0) as working_day
+				, coalesce(sum(case when (work_in_dt is not null and work_out_dt is not null )
+				   then round( ((extract(epoch from (work_out_dt - work_in_dt))/60)/60)::numeric, 0)
+				   else null end),0) as work_hour
+				, coalesce(sum(case when late = '지각' then 1 else 0 end ),0) as late_cnt
+		from web.work_list
+		where 1=1
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'staffName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						officer_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'bldgName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						comp_in_nm LIKE '%' || #{item} || '%'
+						or comp_out_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						officer_nm LIKE '%' || #{item} || '%'
+						or comp_in_nm LIKE '%' || #{item} || '%'
+						or comp_out_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and work_st_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+	</select>	
+	
+	<update id="updateWorkGrid" parameterType="hashMap">
+		update web.work_list set
+			updt_dt = NOW()
+			, updt_id = #{updtId}
+			, memo_in = #{memoIn}
+			, memo_out = #{memoOut}
+			, work_in_dt = #{workInDt}::timestamp
+			, work_out_dt = #{workOutDt}::timestamp
+			<choose>
+				<when test=' workInDt != null and workInDt != "" '>
+					, work_in_yn = 'Y'
+					, late = (case when (#{workStDt}::date || ' ' || (select code_dtl_nm from web.code where code_cd = 'workStInTime'))::timestamp > #{workInDt}::timestamp then '' else '지각' end)
+				</when>
+				<when test=' workInDt == null or workInDt == "" '>
+					, work_in_yn = 'N'
+					, late = ''
+				</when>
+				<when test='workOutDt != null and workOutDt != "" '>
+					, work_out_yn = 'Y'
+				</when>
+				<when test='workOutDt == null or workOutDt == "" '>
+					, work_out_yn = 'N'
+				</when>
+			</choose>
+		where work_st_dt = #{workStDt}::date and officer_id = #{officerId}
+	</update>
+	
+	<insert id="saveWorkGrid" parameterType="hashMap">
+		insert into web.work_list (
+			work_st_dt
+			, officer_id 
+			, officer_nm 
+			, work_in_dt 
+			, work_in_yn 
+			, late
+			, comp_in_nm 
+			, comp_in_cd 
+			, post_in_loc_nm 
+			, work_out_dt 
+			, work_out_yn 
+			, comp_out_nm 
+			, comp_out_cd 
+			, post_out_loc_nm 
+			, memo_in
+			, memo_out
+			, cret_dt 
+			, cret_id 
+		)values(
+			#{workStDt}::date
+			, #{officerId} 
+			, (select name from web.member where id = #{officerId})
+			, #{workInDt}::timestamp
+			<choose>
+				<when test='workInDt != null'>
+					, 'Y'
+					, (case when (#{workStDt}::date || ' ' || (select code_dtl_nm from web.code where code_cd = 'workStInTime'))::timestamp > #{workInDt}::timestamp then '' else '지각' end)
+				</when>
+				<otherwise>
+					, 'N'
+					, ''
+				</otherwise>
+			</choose>
+			, (select bldg_nm from web.bldg where bldg_cd = #{compInCd}) 
+			, #{compInCd} 
+			, #{postInLocNm} 
+			, #{workOutDt}::timestamp
+			<choose>
+				<when test='workOutDt != null'>
+					, 'Y'
+				</when>
+				<otherwise>
+					, 'N'
+				</otherwise>
+			</choose>
+			, (select bldg_nm from web.bldg where bldg_cd = #{compOutCd}) 
+			, #{compOutCd}
+			, #{postOutLocNm} 
+			, #{memoIn}
+			, #{memoOut}
+			, NOW() 
+			, #{cretId} 
+		)
+	</insert>
+	
+	<update id="saveWorkStTime" parameterType="hashMap">
+		update web.code set
+			code_dtl_nm = #{workStInTime}
+		where code_cd = 'workStInTime'
+	</update>
+	
+	<select id="chkWorkDup" parameterType="hashMap" resultType="WorkVo">
+		select work_st_dt
+			, officer_id
+		from web.work_list
+		where work_st_dt = #{workStDt}::date
+		and officer_id = #{officerId}
+	</select>
+	
+	<select id="getWorkStTime" resultType="hashMap">
+		select substring(code_dtl_nm, 1, 2) as hour
+				, substring(code_dtl_nm, 4, 2) as minute
+		from web.code 
+		where code_cd = 'workStInTime' and code_dtl_cd = 'time' 
+	</select>
+</mapper>

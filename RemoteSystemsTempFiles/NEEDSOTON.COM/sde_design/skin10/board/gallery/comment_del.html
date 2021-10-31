@@ -1,0 +1,27 @@
+<!--@layout(/layout/basic/layout.html)-->
+<div module="board_CommentDeletePackage_8">
+    <!--@css(/css/module/board/commentDeletePackage.css)-->
+    <div module="board_title_8">
+ 
+
+        <div class="title">
+            <h2>{$board_title}</h2>
+            <p>{$board_info}</p>
+        </div>
+    </div>
+
+    <div module="Board_CommentDel_8">
+        <div class="commentDel">
+            <h3><img src="//img.echosting.cafe24.com/skin/base_ko_KR/board/h3_comment.gif" alt="댓글삭제" /></h3>
+            <fieldset>
+                <legend>댓글삭제</legend>
+                <p class="info">댓글 등록 시 입력한 <strong class="txtEm">비밀번호를 입력하여 주십시요.</strong></p>
+                <p class="password"><label for="comment_password">비밀번호</label> {$form.comment_password}</p>
+                <div class="ec-base-button gBlank30">
+                    <a href="{$link_board_list}"><img src="//img.echosting.cafe24.com/skin/base_ko_KR/board/btn_secret_list.gif" alt="목록" /></a>
+                    <input type="image" src="//img.echosting.cafe24.com/skin/base_ko_KR/board/btn_secret_submit.gif" alt="확인" />
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>

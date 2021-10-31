@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.BuildingMapper">
+
+	<select id="getBuildingQrList" parameterType="hashMap" resultType="CodeVo">
+	select bldg_cd cd
+		  , bldg_nm as nm
+	from web.bldg
+	where 1=1	
+	<if test="selectBldg != null">
+	AND bldg_cd in 
+		<foreach collection="selectBldg" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</if>
+	order by cret_dt
+	</select>
+	
+	<select id="getBuildingTotal" resultType="hashMap">
+		select coalesce(sum(case when auth = 'own' then 1 else 0 end),0) as bldgTotalOwn
+			, coalesce(sum(case when auth = 'mnFact' then 1 else 0 end),0) as bldgTotalMnFact
+			, coalesce(sum(case when auth = 'finFact' then 1 else 0 end),0) as bldgTotalFinFact
+		from web.bldg 
+	</select>	
+
+	<select id="getBuildingList" parameterType="hashMap" resultType="BuildingVo">
+		select area_cd 
+				, area_nm 
+				, bldg_cd 
+				, bldg_nm 
+				, dtl_addr 
+				, memo 
+				, active_yn
+				, auth
+			   , to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			   , cret_id
+			   , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			   , updt_id
+		from web.bldg 
+		where 1=1		
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'area'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						area_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'bulName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						bldg_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						area_nm LIKE '%' || #{item} || '%'
+						or bldg_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="active != null">
+			and active_yn = #{active}::bool
+		</if>
+		order by bldg_cd desc
+	</select>
+	
+	<insert id="saveBuilding" parameterType="hashMap">
+		insert into web.bldg(
+			area_cd
+			, area_nm
+			, bldg_cd
+			, bldg_nm
+			, dtl_addr
+			, memo 
+			, auth
+			, cret_dt 
+			, cret_id 
+		)values(
+			#{areaCd}
+			, #{areaNm}
+			, #{bldgCd}
+			, #{bldgNm}
+			, #{dtlAddr}
+			, #{memo}
+			, #{auth}
+			, NOW() 
+			, #{cretId} 
+		)
+	</insert>
+	
+	<delete id="deleteBuilding" parameterType="hashMap">
+		delete from web.bldg
+		where bldg_cd=#{bldgCd}
+	</delete>
+	
+	<update id="updateBuilding" parameterType="hashMap">
+		UPDATE web.bldg SET 
+		   area_cd = #{areaCd}
+			, area_nm = #{areaNm}
+			, bldg_nm = #{bldgNm}
+			, dtl_addr = #{dtlAddr}
+			, memo = #{memo}
+			, auth = #{auth}
+			, active_yn = #{activeYn}::bool
+		    , updt_dt = NOW()
+		    , updt_id = #{updtId}
+		WHERE bldg_cd = #{bldgCd}
+	</update>
+	
+	<update id="updateBuildingGrid" parameterType="BuildingVo">
+		UPDATE web.bldg SET 
+			bldg_nm = #{bldgNm}
+			, memo = #{memo}
+			, active_yn = #{activeYn}
+			, auth = #{auth}
+		    , updt_dt = NOW()
+		    , updt_id = #{updtId}
+		WHERE bldg_cd = #{bldgCd}
+	</update>
+	
+	<select id="dupCheckBuilding" parameterType="hashMap" resultType="Integer">
+	select count(bldg_cd)
+	  from WEB.bldg bb 
+	 where 1=1
+	   and area_cd  = #{areaCd}
+	   and dtl_addr  = #{dtlAddr}
+	</select>
+	
+	<select id="getNewBldgCd" resultType="String">
+	 select 'B'|| LPAD( (substring(max(bldg_cd),2,11)::int+1)::varchar, 9, '0') as newBldgCd
+	from web.bldg
+	</select>
+	
+
+</mapper>

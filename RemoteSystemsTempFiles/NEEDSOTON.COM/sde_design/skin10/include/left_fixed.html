@@ -1,0 +1,44 @@
+ <!-- left_fixed -->
+ 
+ 
+<script type=text/javascript>
+$(document).ready(function(){
+
+    var nav = $('#left_fixed');
+    var navoffset = $('#left_fixed').offset();  
+    /* offset�� �̿��Ͽ� .menu(�޴�����)�� ��ġ���� �˾Ƴ��� navoffset�� �־�д� */
+
+    $(window).scroll(function () {
+        if ($(this).scrollTop() >= navoffset.top) {  /* ȭ�� ��ũ�� ���� �޴������� top���� ���� Ŀ���� */
+            nav.css('position','fixed').css('top',0); /* ȭ�� ���ʿ� ������Ų��. */
+        }else {
+            nav.css('position','absolute').css('top',216); /* ó�� �޴������� top ������ ������ */
+        }
+    });
+});
+</script>
+
+ 
+
+
+<div id="left_fixed" class="left">
+
+ 
+
+		    <!-- ���� ī�װ� ���� -->
+			<!--@import(/include/left_cate_area.html)-->
+		    <!-- ���� ī�װ� ���� -->
+
+ 
+ 
+ 
+ 
+ 
+ </div>
+
+ 
+
+ <!-- left_fixed -->
+ 
+
+ 

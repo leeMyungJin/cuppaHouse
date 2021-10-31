@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="euc-kr">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0, user-scalable=yes, shrink-to-fit=no">
+    <title></title>
+    <!--@css(/layout/basic/css/common.css)-->
+    <!--@css(/layout/basic/css/layout.css)-->
+    <!--@css(/layout/basic/css/button.css)-->
+    <!--@css(/layout/basic/css/paginate.css)-->
+
+    <!-- 스마트디자인에서는 JQuery 1.4.4 버전이 내장되어있습니다. 추가로 호출하면 충돌이 생길 수 있습니다. -->
+    <!--@js(/layout/basic/js/common.js)-->
+</head>
+<body id="main">
+<div module="Popup_MultiPopup">
+        <!--
+            $banner_popup_no =
+            ※ 노출시킬 팝업의 ID를 숫자로 넣어주세요.
+        -->
+        {$popup}
+    </div>
+    <div module="Popup_MultiBanner">
+        <!--
+            $banner_popup_no =
+            ※ 노출시킬 배너의 ID를 숫자로 넣어주세요.
+        -->
+        {$banner}
+    </div>
+    <div module="Popup_Mobile">{$mobile}</div>
+    <div id="wrap">
+        <!--@import(/layout/basic/sidebar.html)-->
+        <hr class="layout">
+        <div id="container">
+			
+            <header id="header">
+                <div class="header">
+					<!--@import(/layout/basic/navigation.html)-->
+
+                </div>
+                    <section id="topArea">
+					<!--@import(/layout/basic/header.html)-->
+                        
+						
+                    </section>
+            </header>
+
+					
+<div style="margin-top:0px;"><a href="/outpage/about.html">
+	<img src="/web/upload/good_mobile_img/m_main_about.jpg" width="100%"></a><a href="/article/공지사항/1/8/"><img src="/web/upload/good_mobile_img/main_banner_02.jpg" width="50%"></a><a href="/board/gallery/list.html?board_no=8"><img src="/web/upload/good_mobile_img/main_banner_03.jpg" width="50%"></a><a href="/board/product/list.html?board_no=6"></a></div>
+
+
+<hr class="layout">
+            <div id="contents">
+                <!--@contents-->
+            </div>
+
+ <div class="instar_title"><img src="/web/upload/good_mobile_img/m_main_insta.jpg" width="100%;"></div>
+
+
+<!-- SnapWidget -->
+ <div id="instar_area">
+ 
+ <div id="instar_link" onclick="window.open('https://www.instagram.com/needsoton/')"  style="cursor:pointer;">	</div>	 
+
+
+<center><iframe  src="https://snapwidget.com/embed/543093" class="snapwidget-widget" allowTransparency="true" frameborder="0" scrolling="no"  width="98%" ></iframe></center> 
+
+
+</div> 
+ <!-- SnapWidget -->
+
+<hr class="layout">
+            <!--@import(/layout/basic/footer.html)-->
+        </div>
+    </div>
+</body>
+</html>

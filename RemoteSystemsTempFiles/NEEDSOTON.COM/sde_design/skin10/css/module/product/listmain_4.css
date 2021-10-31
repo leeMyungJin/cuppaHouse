@@ -1,0 +1,60 @@
+/* ���� */
+.xans-product-4 { margin:20px 0 0 0;}
+.xans-product-4 h2 { margin:0 0 16px; font-weight:normal; font-size:20px; font-family:Arial, "����", Dotum, sans-serif; color:#2e2e2e; text-align:center; }
+.xans-product-4 img { vertical-align:middle; }
+.xans-product-4 ul.prdList { display:table; width:100%; min-width:756px; padding:0 0 0 0; font-size:0; line-height:0;    }
+.xans-product-4 ul.prdList li.item { display:inline-block; padding:20px 0 20px 0; margin:0 0 20px 0; color:#757575; vertical-align:top; *display:inline; *zoom:1; background:rgba(255,255,255,0.7); }
+.xans-product-4 ul.prdList li.item .box { margin:0 auto; font-size:12px; line-height:18px; text-align:center; }
+.xans-product-4 ul.prdList li .color { overflow:hidden; display:inline-block; margin:3px 0 0 0; }
+.xans-product-4 ul.prdList.column3 li .color { width:176px; }
+.xans-product-4 ul.prdList.column4 li .color { width:116px; }
+.xans-product-4 ul.prdList.column5 li .color { width:76px; }
+.xans-product-4 ul.prdList li .chips { float:left; width:10px; height:10px; margin:0 2px 2px 0; border:1px solid #e3e3e3; font-size:0; line-height:0; }
+
+.xans-product-4 ul.prdList .thumb { margin:0 0 10px; border:1px solid #e6e6e6; border-radius: 7px;}
+.xans-product-4 ul.prdList .thumb:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+
+.xans-product-4 ul.prdList .name { text-align:center;  line-height:23px; }
+.xans-product-4 ul.prdList .name a { color:#2e2e2e; }
+.xans-product-4 ul.prdList .name .title { font-weight:normal; margin:0 0 0 0;}
+
+.xans-product-4 ul.prdList .name2 { border-bottom:1px solid #e3e3e3; line-height:10px;}
+
+
+.xans-product-4 ul.prdList .status { margin:16px  0 0 0; padding:0 0 0 0;  text-align:center; line-height:0; *zoom:1; }
+.xans-product-4 ul.prdList .status:after { content:""; display:block; clear:both; }
+.xans-product-4 ul.prdList .icon { text-align:center; }
+.xans-product-4 ul.prdList .icon img { margin:0 3px 0 0; }
+.xans-product-4 ul.prdList .button { margin:5px 0 0 0; *zoom:1; }
+.xans-product-4 ul.prdList .button img { margin:0 5px 6px 0; cursor:pointer; }
+.xans-product-4 ul.prdList .button .option { display:inline; position:relative; *zoom:1; }
+.xans-product-4 ul.prdList .mileage { display:block; }
+.xans-product-4 ul.prdList span.grid { display:block; }
+
+.xans-product-listitem li { text-align:left; }
+
+/* ������� */
+.xans-product-4 ul.column4 li.item { width:25%; }
+.xans-product-4 ul.column4 li.item .box { width:270px; }
+.xans-product-4 ul.column4 li.item .thumb { width:270px; }
+
+.xans-product-4 ul.column5 li.item { width:19.99%; }
+.xans-product-4 ul.column5 li.item .box { width:210px; }
+.xans-product-4 ul.column5 li.item .thumb { width:210px;}
+
+/* module="product_ListItem" */
+.xans-product-4 .xans-product-listitem { margin:15px 0 0 0; }
+.xans-product-4 .xans-product-listitem li .title { font-weight:normal; vertical-align:top; }
+.xans-product-4 .xans-product-listitem li .title span { vertical-align:top; }
+
+/* ���αⰣ ���̾� */
+.xans-product-4 .discountPeriod { display:inline-block; z-index:10; position:relative; width:55px; height:19px; vertical-align:middle; *zoom:1; *display:inline; }
+.xans-product-4 .discountPeriod .edge { position:absolute; left:50%; top:-6px; width:10px; height:6px; margin:0 0 0 -5px; font-size:0; line-height:0; background:url("http://img.echosting.cafe24.com/skin/base_ko_KR/common/ico_tip_edge.gif") no-repeat 0 0; }
+.xans-product-4 .layerDiscountPeriod { display:none; position:absolute; left:50%; top:26px; width:247px; margin:0 0 0 -124px; border:1px solid #565960; font-size:12px; background-color:#fff; }
+.xans-product-4 .layerDiscountPeriod strong.title { display:block; margin:0 0 12px; padding:0 35px 0 0; font-weight:bold; color:#2e2e2e; }
+.xans-product-4 .layerDiscountPeriod .content { padding:9px 10px 12px 14px; font-family:Verdana, "����", Dotum, sans-serif; }
+.xans-product-4 .layerDiscountPeriod .content p { margin:2px 0 0; font-size:11px; color:#000; line-height:16px; color:#757575; letter-spacing:-1px; }
+.xans-product-4 .layerDiscountPeriod .content p strong { font-weight:normal; font-size:12px; color:#2e2e2e; }
+.xans-product-4 .layerDiscountPeriod .content p strong span { font-size:11px; }
+.xans-product-4 .layerDiscountPeriod .close { position:absolute; right:14px; top:14px; }
+.xans-product-4 .layerDiscountPeriod .close img { cursor:pointer; }

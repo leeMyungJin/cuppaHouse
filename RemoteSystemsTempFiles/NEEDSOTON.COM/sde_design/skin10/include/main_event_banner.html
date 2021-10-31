@@ -1,0 +1,113 @@
+<style type="text/css">
+ .column div {
+	position: relative;
+	float: left;
+	width: 370px;
+	height:361px;
+ 	margin: 0 0 0 0;
+	padding: 0;
+	background:red;
+ }
+  
+  .column .text {
+	position: relative;
+	width: 370px;
+	height:85px;
+	background-color:#eeeeee;
+	font-weight: bold;
+	text-align:center;
+	color:#ffffff;
+	margin: -15px 0 0 0;
+	padding:20px 0 0 0;  /* ���� ��ġ ���� ��Ÿ�� */ 
+ 	cursor:pointer;
+ 	border: 0px;
+}
+ 
+ .column .text1 {    /*ù��° �� ��Ÿ�� */
+	position: relative;
+	width: 370px;
+ 	line-height:25px;
+	font-size: 11pt; 
+	font-weight: bold;
+	text-align:center;
+	color:#000000;
+	margin: 0 0 0 0;
+ 	padding:0 0 0 0;
+	cursor:pointer;
+	border: 0px;
+ 	z-index:999999;
+}
+ 
+ .column .text2 {   /*�ι�° �� ��Ÿ�� */
+ 	width: 370px;
+ 	font-size: 11pt;
+ 	line-height:25px;
+	font-weight: bold;
+	text-align:center;
+	color:#808080;
+	margin: 0 0 0 0;
+ 	background-color:#eeeeee;
+	cursor:pointer;
+	border: 0px;
+ 	z-index:999999;
+}
+
+
+figure {
+	width: 370px;
+	height: 361px;
+	margin: 0;
+	padding: 0;
+	background: #fff;
+	overflow: hidden;
+}
+
+figure:hover+span {
+	bottom: 0;
+	opacity: 1;
+}
+
+
+
+/* Zoom In #1 */
+.over figure img {
+	-webkit-transform: scale(1);
+	transform: scale(1);
+	-webkit-transition: .2s ease-in-out;
+	transition: .2s ease-in-out;
+}
+.over figure:hover img {
+	-webkit-transform: scale(1.05);
+	transform: scale(1.05);
+}
+
+ 
+</style>
+
+<!-- event_item_area -->
+     <div class="event_item_area" >
+		  
+		  <!-- event_item -->
+          <div class="event_item" >
+
+	<div class="over column">
+		<div style=" margin-right:45px;" >
+			<figure><a href="/outpage/about.html"><img src="/web/upload/good_images/event_item_01.jpg"></a> </figure>
+		</div>
+		<div style=" margin-right:45px;" >
+			<figure><a href="/article/공지사항/1/8/"><img src="/web/upload/good_images/event_item_02.jpg"></a></figure>
+		</div>
+		<div>
+			<figure><a href="/product/list.html?cate_no=63"><img src="/web/upload/good_images/event_item_03.jpg"></a></figure>
+		</div>
+	</div>
+
+          </div>
+          <!-- event_item -->
+
+
+ 
+
+
+     </div>
+     <!-- event_item_area -->

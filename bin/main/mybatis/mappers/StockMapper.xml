@@ -1,0 +1,1406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.StockMapper">
+	<select id="getStockManageList" parameterType="hashMap" resultType="com.cuppaHouse.vo.StockVo">
+		select *
+		from(
+			select 	a.type_cd as id
+					,(select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd) as name
+					, '0' as level
+					, max(a.type_cd)  as type_cd
+					,(select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, true as active_yn
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by a.type_cd
+			
+			union all
+			
+			select 	b.l_categy_cd as id
+					, b.l_categy_nm as name
+					, '1' as level
+					, max(a.type_cd)  as type_cd
+					,max( (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) ) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, true as active_yn
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by b.l_categy_cd, b.l_categy_nm
+				
+			union all
+			
+			select 	b.m_categy_cd as id
+					, b.m_categy_nm as name
+					, '2' as level
+					, max(a.type_cd)  as type_cd
+					, max( (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) ) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, true as active_yn
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by b.m_categy_cd, b.m_categy_nm
+			
+			union all
+			
+			select 	a.item_cd as id
+					,a.item_nm as name
+					, '3' as level
+					, a.type_cd
+					, (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) as type_nm
+					, b.l_categy_nm
+					, b.m_categy_nm
+					, a.item_cd
+					, a.item_nm
+					, a.unit
+					, coalesce(c."cost", a."cost" ) as "cost"
+					, a.sell_price
+					, a.tag_quantity
+					, a.quantity
+					, a.prod_quantity
+					, a.active_yn
+					, to_char(a.cret_dt, 'YYYY-MM-DD') as cret_dt 
+				    , a.cret_id
+				    , to_char(a.updt_dt, 'YYYY-MM-DD') as updt_dt 
+				    , a.updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+									left join (select ip.item_cd, sum(ip.part_quantity * cd."cost") as "cost"
+												from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd
+												group by ip.item_cd) c on a.item_cd = c.item_cd
+		) a
+		where 1=1
+		<if test="inq != null">
+			<choose>
+				<when test="con == 'all'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.l_categy_nm like '%' ||  #{item} || '%' 
+						or 
+						a.m_categy_nm like '%' ||  #{item} || '%'
+						or
+						a.item_cd like '%' ||  #{item} || '%' 
+						or
+						a.item_nm like '%' ||  #{item} || '%'  
+					</foreach>
+				</when>
+				<when test="con == 'cgNanme'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.l_categy_nm like '%' ||  #{item} || '%' 
+						or 
+						a.m_categy_nm like '%' ||  #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_nm like '%' ||  #{item} || '%'  
+					</foreach>
+				</when>
+				<when test="con == 'pdCode'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_cd like '%' ||  #{item} || '%' 
+					</foreach>
+				</when>
+			</choose>
+		</if>
+		<if test="typeCd != null and typeCd != 'all'">
+			and a.type_cd like '%' ||  #{typeCd} || '%'
+		</if>
+		order by a.id desc
+	</select>
+	
+	<select id="getStockQrList" parameterType="hashMap" resultType="CodeVo">		
+		select item_cd cd
+			  , item_nm as nm
+		from web.category_dtl
+		where 1=1	
+		<if test="selectStock != null">
+		AND item_cd in 
+			<foreach collection="selectStock" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+		order by cret_dt desc
+	</select>
+		
+	<select id="getTotalItemCnt" resultType="String">
+		select count(*) as totalItemCnt
+		from web.category_dtl;
+	</select>
+	
+	<select id="getCategoryList" resultType="StockVo">
+		SELECT type_cd
+			, l_categy_cd
+			, l_categy_nm
+			, m_categy_cd
+			, m_categy_nm
+			, to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+		    , cret_id
+		    , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+		    , updt_id
+		FROM web.category_bas
+		order by cret_dt desc
+	</select>
+	
+	<delete id="deleteCategory" parameterType="StockVo">
+		DELETE FROM web.category_bas 
+		WHERE type_cd = #{typeCd}
+		AND l_categy_cd = #{lCategyCd}
+		AND m_categy_cd = #{mCategyCd};
+	</delete>
+	
+	<insert id="saveCategory" parameterType="StockVo">
+		INSERT INTO WEB.CATEGORY_BAS 
+		  (type_cd, l_categy_cd, l_categy_nm, m_categy_cd, m_categy_nm, cret_dt, cret_id)
+		  VALUES (#{typeCd}, #{typeCd} || #{lCategyCd}, #{lCategyNm} ,#{typeCd} || #{lCategyCd} || #{mCategyCd}, #{mCategyNm}, now(), #{cretId})
+		ON CONFLICT(type_cd, l_categy_cd, m_categy_cd) DO
+		UPDATE
+			SET l_categy_nm = #{lCategyNm}
+			, m_categy_nm = #{mCategyNm}
+			, updt_dt = now()
+			, updt_id = #{updtId}
+	</insert>
+	
+	<update id="updateCategory" parameterType="StockVo">
+	update web.CATEGORY_BAS set
+			l_categy_nm = #{lCategyNm}
+			, m_categy_nm = #{mCategyNm}
+			, updt_dt = now()
+			, updt_id = #{updtId}
+	where type_cd = #{typeCd}
+	and l_categy_cd = #{lCategyCd}
+	and m_categy_cd = #{mCategyCd}
+	</update>
+	
+	<select id="getLCategoryList" parameterType="hashMap" resultType="StockVo">
+		select distinct type_cd, l_categy_cd, l_categy_nm
+		from web.category_bas
+		where 1=1
+		<if test="typeCd != 'all' and typeCd != null">
+			<choose>
+				<when test="typeCd == 'part'">
+					and type_cd in ('2', '4')
+				</when>
+				<otherwise>
+					and type_cd = #{typeCd}
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="getMCategoryList" parameterType="hashMap" resultType="StockVo">
+		select l_categy_cd, m_categy_cd, m_categy_nm
+		from web.category_bas
+		where 1=1
+		<if test="typeCd != 'all' and typeCd != null">
+			<choose>
+				<when test="typeCd == 'part'">
+					and type_cd in ('2', '4')
+				</when>
+				<otherwise>
+					and type_cd = #{typeCd}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="lCategyCd != 'all' and lCategyCd != null">
+			and l_categy_cd = #{lCategyCd}
+		</if>
+	</select>
+	
+	<insert id="addItem" parameterType="StockVo">
+		INSERT INTO web.category_dtl (
+			type_cd
+			, l_categy_cd
+			, m_categy_cd
+			, item_cd
+			, item_nm
+			, unit
+			, "cost"
+			, sell_price
+			, tag_quantity
+			, active_yn
+			, cret_dt
+			, cret_id
+		) VALUES(
+			#{typeCd}
+			, #{lCategyCd}
+			, #{mCategyCd}
+			, #{mCategyCd} || 
+				(select coalesce( LPAD( (max(COALESCE(substring(item_cd, 8,10), '0')::int)+1)::char, 3, '0'), '001')
+				from web.category_dtl 
+				where item_cd like #{mCategyCd} || '%')
+			, #{itemNm}
+			, #{unit}
+			, #{cost}
+			, #{sellPrice}
+			, #{tagQuantity}
+			, true
+			, NOW()
+			, #{cretId}
+		);
+
+	</insert>
+	
+	<delete id="deleteItem" parameterType="StockVo">
+		DELETE FROM web.category_dtl
+		WHERE item_cd = #{id};
+	</delete>
+	
+	<insert id="saveItem" parameterType="StockVo">
+	update web.category_dtl set
+		"cost" = #{cost}
+		, sell_price = #{sellPrice}
+		, tag_quantity = #{tagQuantity}
+		, active_yn = #{activeYn}
+		, updt_dt = now()
+		, updt_id = #{updtId}
+		, item_nm = #{name}
+	where item_cd = #{id}
+
+	</insert>	
+	
+	<select id="dupCategoryChk"  parameterType="hashMap" resultType="StockVo">
+		SELECT type_cd
+			, l_categy_cd
+			, l_categy_nm
+			, m_categy_cd
+			, m_categy_nm
+		FROM web.category_bas
+		where type_cd = #{typeCd}
+		and l_categy_cd = #{typeCd} || #{lCategyCd}
+		and m_categy_cd = #{typeCd} || #{lCategyCd} || #{mCategyCd}
+	</select>	
+	
+	<select id="getPartName"  parameterType="hashMap" resultType="StockVo">
+		select item_nm, item_cd from web.category_dtl where item_cd = #{partNm}
+	</select>	
+	
+	<select id="getPartFullList"  parameterType="hashMap" resultType="StockVo">
+		select cb.l_categy_nm 
+			, cb.l_categy_cd
+			, cb.m_categy_nm 
+			, cb.m_categy_cd
+			, cd.item_nm as part_nm
+			, cd.item_cd as part_cd
+			, cd.unit 
+			, cd."cost" 
+		from web.category_dtl cd left join web.category_bas cb on cd.type_cd = cb.type_cd 
+														  and cd.l_categy_cd = cb.l_categy_cd 
+														  and cd.m_categy_cd = cb.m_categy_cd 
+		where cd.type_cd = '3'
+		and cd.item_cd not in (select distinct ip.part_cd
+								from web.item_part ip left join web.category_dtl cd on ip.item_cd = cd.item_cd 
+								where cd.type_cd = (select type_cd
+													from web.category_dtl
+													where item_cd = #{itemCd}))
+		<if test="partNm != '' and partNm != null">
+			and ( cd.item_nm like '%' || #{partNm} || '%' or cd.item_cd like '%' || #{partNm} || '%')
+		</if>
+	</select>	
+	
+	<select id="getPartList"  parameterType="hashMap" resultType="StockVo">
+	select ip.item_part_seq 
+			, cb.l_categy_nm 
+			, cb.m_categy_nm 
+			, cd.item_nm as part_nm
+			, cd.item_cd as part_cd
+			, ip.item_cd
+			, cd.unit 
+			, cd."cost" 
+			, ip.part_quantity 
+	from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+						left join web.category_bas cb on cd.type_cd = cb.type_cd 
+													  and cd.l_categy_cd = cb.l_categy_cd 
+													  and cd.m_categy_cd = cb.m_categy_cd 
+	where ip.item_cd = #{itemCd}
+	<if test="partNm != '' and partNm != null">
+		and ( cd.item_nm like '%' || #{partNm} || '%' or ip.part_cd like '%' || #{partNm} || '%')
+	</if>
+	</select>
+	
+	<delete id="deletePart" parameterType="StockVo">
+	delete from web.item_part
+	where item_part_seq = #{itemPartSeq}
+	</delete>
+	
+	<update id="updatePart" parameterType="StockVo">
+	update web.item_part set
+		part_quantity = #{partQuantity}
+	where item_part_seq = #{itemPartSeq}
+	</update>
+	
+	<insert id="savePart" parameterType="StockVo">
+	INSERT INTO web.item_part(
+		item_cd
+		, part_cd
+		, part_quantity
+		, cret_dt
+		, cret_id
+	)VALUES(
+		#{itemCd}
+		, #{partCd}
+		, #{partQuantity}
+		, now()
+		, #{cretId}
+	);
+	</insert>
+	
+	<!--/////////////////// 재고입력 /////////////////// -->
+	<select id="getEntryList" parameterType="hashMap" resultType="com.cuppaHouse.vo.StockVo">
+		select 	#{classifiCd} as classifi_cd
+				, #{bldgCd} as bldg_cd
+				, cb.type_cd 
+				, cd.l_categy_cd 
+				, cb.l_categy_nm 
+				, cd.m_categy_cd 
+				, cb.m_categy_nm 
+				, cd.item_cd 
+				, cd.item_nm 
+				, cd."cost" 
+				, cd.quantity 
+				, now() as updt_dt
+				, ip.part_quantity 
+		from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+							left join web.category_bas cb on cd.type_cd = cb.type_cd and cd.l_categy_cd = cb.l_categy_cd and cd.m_categy_cd  = cb.m_categy_cd
+		where ip.item_cd in (select p.item_cd 
+							from web.process p 
+							where p.bldg_cd = #{bldgCd}
+							and p.prc_end_dt is null)
+		order by cd.m_categy_cd
+	</select>
+	
+		
+	<select id="getTotalEntryCnt" resultType="hashMap">
+		select count(distinct a.bldg_cd) as totalStockBldg
+			, count(distinct a.part_cd) as totalStockItem
+		from(
+			select p.bldg_cd, ip.part_cd, max(cd.quantity), sum(p.prod_cnt::numeric * ip.part_quantity::numeric )
+			from web.process p join web.item_part ip on p.item_cd = ip.item_cd
+							left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+			where p.prc_end_dt is null
+			group by p.bldg_cd, ip.part_cd 
+			having sum(p.prod_cnt::numeric * ip.part_quantity::numeric ) > max(cd.quantity) ) a
+	</select>
+	
+	<insert id="saveEntry" parameterType="StockVo">
+		INSERT INTO web.category_dtl_sar(
+			cate_sar_seq
+			, cate_sar_group_seq
+			, bldg_cd
+			, bldg_nm
+			, classifi_cd
+			, classifi_nm
+			, type_cd
+			, type_nm
+			, l_categy_cd
+			, l_categy_nm
+			, m_categy_cd
+			, m_categy_nm
+			, item_cd
+			, item_nm
+			, "cost"
+			<choose>
+				<when test='classifiCd == "I" or classifiCd == "O"'>
+				, sar_quantity
+				</when>
+				<when test='classifiCd == "CI" or classifiCd == "CO"'>
+				, return_quantity
+				</when>
+			</choose>
+			, quantity
+			, sell_price
+			, cret_dt
+			, cret_id
+			, updt_nm
+		)VALUES(
+			(select coalesce(max(cate_sar_seq)+1, 1) from WEB.category_dtl_sar) -- 시퀀스
+			, #{groupSeq}
+			, #{bldgCd}
+			, (select bldg_nm from web.bldg where bldg_cd = #{bldgCd})
+			, #{classifiCd}
+			, (select code_dtl_nm from web.code where code_cd = 'classifi' and code_dtl_cd = #{classifiCd})
+			, #{typeCd}
+			, (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = #{typeCd})
+			, #{lCategyCd}
+			, (select distinct l_categy_nm from web.category_bas where l_categy_cd = #{lCategyCd})
+			, #{mCategyCd}
+			, (select m_categy_nm from web.category_bas where type_cd = #{typeCd} and l_categy_cd = #{lCategyCd} and  m_categy_cd = #{mCategyCd})
+			, #{itemCd}
+			, (select item_nm from web.category_dtl where item_cd = #{itemCd})
+			, #{cost}
+			, #{quantityCnt}
+			, (select quantity 
+				from web.category_dtl 
+				where item_cd = #{itemCd}) -- 물품재고
+			, (select sell_price from web.category_dtl where item_cd = #{itemCd})
+			, NOW()
+			, #{cretId}
+			, (select name from web.member where id = #{updtId} )
+		);
+	</insert>
+	
+	<update id="updateQuantity" parameterType="StockVo">
+		update web.category_dtl set
+			quantity = (select coalesce(quantity,0) 
+						from web.category_dtl 
+						where item_cd = #{itemCd} ) 
+				<choose>
+					<when test="cateSarSeq != null">
+						<choose>
+							<when test='classifiCd == "I"'>
+								+ #{sarQuantity} - (select sar_quantity
+													from web.category_dtl_sar 
+													where cate_sar_seq = #{cateSarSeq}::numeric )
+							</when>
+							<when test='classifiCd == "O"'>
+								- #{sarQuantity} + (select sar_quantity
+													from web.category_dtl_sar 
+													where cate_sar_seq = #{cateSarSeq}::numeric )
+							</when>
+							<when test="classifiCd == 'CI'">
+								+ #{returnQuantity} - (select return_quantity
+													from web.category_dtl_sar 
+													where cate_sar_seq = #{cateSarSeq}::numeric )
+							</when>
+							<when test="classifiCd == 'CO'">
+								- #{returnQuantity} + (select return_quantity
+													from web.category_dtl_sar 
+													where cate_sar_seq = #{cateSarSeq}::numeric )
+							</when>
+						</choose>
+					</when>
+					<otherwise>
+						<choose>
+							<when test='classifiCd == "I" or classifiCd == "CI"'>
+								+ #{quantityCnt}
+							</when>
+							<when test='classifiCd == "O" or classifiCd == "CO"'>
+								- #{quantityCnt}
+							</when>
+						</choose>
+					</otherwise>
+				</choose>
+			, updt_dt		= now()
+			, updt_id		= #{updtId}
+		where item_cd = #{itemCd}
+	</update>
+	
+	
+	<select id="getItemList" parameterType="hashMap" resultType="StockVo">
+		select m_categy_cd
+				, item_cd 
+				, item_nm
+				, cost
+				, quantity
+		from web.category_dtl
+		where 1=1
+		<if test="typeCd != 'all' and typeCd != null">
+			<choose> 
+				<when test="typeCd == 'part'">
+					and type_cd in ('2', '4')
+				</when>
+				<otherwise>
+					and type_cd = #{typeCd}
+				</otherwise>
+			</choose>
+		</if>
+		<if test="lCategyCd != 'all' and lCategyCd != null">
+			and l_categy_cd = #{lCategyCd}
+		</if>
+		<if test="mCategyCd != 'all' and mCategyCd != null">
+			and m_categy_cd = #{mCategyCd}
+		</if>
+	</select>
+	
+	<select id="getBldgList" parameterType="hashMap" resultType="StockVo">
+		select bldg_cd
+				, bldg_nm
+				, auth
+				, to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			    , cret_id
+			    , to_char(updt_dt, 'YYYY-MM-DD') as updt_dt 
+			    , updt_id
+		from web.bldg
+		where active_yn = 'Y'
+	</select>
+	
+	
+	<!-- 재고이력 -->
+	<!--/////////////////// 재고입력 /////////////////// -->
+	<select id="getHistoryList" parameterType="hashMap" resultType="com.cuppaHouse.vo.StockVo">
+		select cds.cate_sar_seq 
+			, to_char(cds.cret_dt, 'YYYY-MM-DD') as cret_dt 
+			, (select name from web.member where id = cds.cret_id) as cret_nm
+			, to_char(cds.updt_dt, 'YYYY-MM-DD') as updt_dt
+			, cds.updt_nm 
+			, cds.bldg_nm 
+			, cds.classifi_nm 
+			, cds.classifi_cd
+			, cds.type_nm 
+			, cds.l_categy_nm 
+			, cds.m_categy_nm 
+			, cds.item_nm 
+			, cds.item_cd 
+			, cds."cost" 
+			, cds.sell_price 
+			, cds.sar_quantity 
+			, cds.return_quantity 
+			, CASE WHEN cd.item_cd IS NULL THEN 'N' ELSE 'Y' END as item_active_yn
+			, cds.quantity 
+			, cds.cate_sar_group_seq as group_seq
+		from web.category_dtl_sar cds left join web.category_dtl cd on cds.item_cd = cd.item_cd
+		where 1=1
+		<if test="inq != null">
+			<choose>
+				<when test="con == 'all'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.updt_nm LIKE '%' || #{item} || '%'
+						or
+						cds.bldg_nm LIKE '%' || #{item} || '%'
+						or
+						cds.classifi_nm LIKE '%' || #{item} || '%'
+						or
+						cds.type_nm LIKE '%' || #{item} || '%'
+						or
+						cds.l_categy_nm LIKE '%' || #{item} || '%'
+						or
+						cds.m_categy_nm LIKE '%' || #{item} || '%'
+						or
+						cds.item_nm LIKE '%' || #{item} || '%'
+						or
+						cds.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'staffName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.updt_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'bldgName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.bldg_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'sortName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.type_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'separate'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.classifi_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'cgNanme'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.l_categy_nm LIKE '%' || #{item} || '%'
+						or
+						cds.m_categy_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdCode'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						cds.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+			</choose>
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and cds.cret_dt between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+		order by cds.cret_dt desc
+	</select>
+	
+		
+	<select id="getTotalHistoryCnt" resultType="hashMap">
+		select coalesce(sum( case when classifi_cd = 'I' then 1 else 0 end ), 0) as ICount
+				,coalesce(sum( case when classifi_cd = 'O' then 1 else 0 end ), 0) as OCount
+				,coalesce(sum( case when classifi_cd = 'CI' then 1 else 0 end ), 0) as CICount
+				,coalesce(sum( case when classifi_cd = 'CO' then 1 else 0 end ), 0)  as COCount
+		from web.category_dtl_sar 
+		where to_char(cret_dt, 'YYYYMMDD')  = to_char(now(), 'YYYYMMDD')
+
+	</select>
+	
+	<update id="saveHistory" parameterType="StockVo">
+		update web.category_dtl_sar set
+			sar_quantity = #{sarQuantity}
+			, return_quantity = #{returnQuantity}
+			, quantity = (select coalesce(quantity,0) 
+						from web.category_dtl 
+						where item_cd = #{itemCd}) -- 물품재고
+			, updt_dt		= now()
+			, updt_id		= #{updtId}
+			, updt_nm 		= (select name from web.member where id = #{updtId} )
+		where cate_sar_seq = #{cateSarSeq}::numeric
+	</update>
+	
+	
+	
+	
+	<select id="getTotalPresentAmt" resultType="hashMap">
+	select coalesce(sum(case when tag_quantity >= quantity then 1 else 0 end),0) as inNeedItemCnt
+		,coalesce(sum(case when type_cd = '2' then "cost" * quantity else 0 end),0) as woodStockAmt
+		,coalesce(sum(case when type_cd = '4' then "cost" * quantity else 0 end),0) as prodStockAmt
+		,coalesce(sum(case when type_cd = '4' then "cost" * sell_price else 0 end),0) as exProdSales
+	from web.category_dtl 
+	where active_yn = 'Y'
+	</select>
+	
+	<select id="getPresentList" parameterType="hashMap" resultType="com.cuppaHouse.vo.StockVo">
+select *
+		from(
+			select 	a.type_cd as id
+					,(select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd) as name
+					, '0' as level
+					, max(a.type_cd)  as type_cd
+					,(select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, case when array_to_string(array_agg(a.active_yn),',') like '%t%' then true else false end as active_yn
+					, null as item_state
+					, 0 as min_stock_cnt
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by a.type_cd
+			
+			union all
+			
+			select 	b.l_categy_cd as id
+					, b.l_categy_nm as name
+					, '1' as level
+					, max(a.type_cd) as type_cd 
+					,max( (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) ) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, case when array_to_string(array_agg(a.active_yn),',') like '%t%' then true else false end as active_yn
+					, null as item_state
+					, 0 as min_stock_cnt
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by b.l_categy_cd, b.l_categy_nm
+				
+			union all
+			
+			select 	b.m_categy_cd as id
+					, b.m_categy_nm as name
+					, '2' as level
+					, max(a.type_cd) as type_cd
+					, max( (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) ) as type_nm
+					, max(b.l_categy_nm) as l_categy_nm
+					, max(b.m_categy_nm) as m_categy_nm
+					, array_to_string(array_agg(a.item_cd),',') as item_cd
+					, array_to_string(array_agg(a.item_nm),',') as item_nm
+					, null as unit
+					, 0 as "cost"
+					, 0 as sell_price
+					, 0 as tag_quantity
+					, 0 as quantity
+					, 0 as prod_quantity
+					, case when array_to_string(array_agg(a.active_yn),',') like '%t%' then true else false end as active_yn
+					, null as item_state
+					, 0 as min_stock_cnt
+					, null as cret_dt 
+				    , null as cret_id
+				    , null as updt_dt 
+				    , null as updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+			group by b.m_categy_cd, b.m_categy_nm
+			
+			union all
+			
+			select 	a.item_cd as id
+					,a.item_nm as name
+					, '3' as level
+					, a.type_cd 
+					, (select code_dtl_nm from web.code where code_cd = 'stockType' and code_dtl_cd = a.type_cd ) as type_nm
+					, b.l_categy_nm
+					, b.m_categy_nm
+					, a.item_cd
+					, a.item_nm
+					, a.unit
+					, a."cost"
+					, a.sell_price
+					, a.tag_quantity
+					, a.quantity
+					, a.prod_quantity
+					, a.active_yn
+					, case when a.tag_quantity >= a.quantity then 'X' else 'O' end as item_state
+					, case when a.type_cd = '4' then 
+							case when c.min_stock_cnt is not null then c.min_stock_cnt else 0 end 
+					   else 0 end as min_stock_cnt
+					, to_char(a.cret_dt, 'YYYY-MM-DD') as cret_dt 
+				    , a.cret_id
+				    , to_char(a.updt_dt, 'YYYY-MM-DD') as updt_dt 
+				    , a.updt_id
+			FROM web.category_dtl a left join web.category_bas b on a.type_cd = b.type_cd
+															and a.l_categy_cd = b.l_categy_cd
+															and a.m_categy_Cd = b.m_categy_cd
+									left join (select ip.item_cd
+													, min(case when cd.quantity > 0 then round(cd.quantity/ip.part_quantity, 0) else 0 end) as min_stock_cnt
+												from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+												group by ip.item_cd) c on a.item_cd = c.item_cd
+		) a
+		where a.active_yn = true
+		<if test="inq != null">
+			<choose>
+				<when test="con == 'all'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.type_nm like '%' ||  #{item} || '%'  
+						or
+						a.l_categy_nm like '%' ||  #{item} || '%' 
+						or 
+						a.m_categy_nm like '%' ||  #{item} || '%'
+						or
+						a.item_cd like '%' ||  #{item} || '%' 
+						or
+						a.item_nm like '%' ||  #{item} || '%'  
+					</foreach>
+				</when>
+				<when test="con == 'sortName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.type_nm like '%' ||  #{item} || '%'  
+					</foreach>
+				</when>
+				<when test="con == 'cgNanme'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.l_categy_nm like '%' ||  #{item} || '%' 
+						or 
+						a.m_categy_nm like '%' ||  #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_nm like '%' ||  #{item} || '%'  
+					</foreach>
+				</when>
+				<when test="con == 'pdCode'">
+				AND 
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_cd like '%' ||  #{item} || '%' 
+					</foreach>
+				</when>
+			</choose>
+		</if>
+		<if test="typeCd != null and typeCd != 'all'">
+			and a.type_cd like '%' ||  #{typeCd} || '%'
+		</if>
+		<if test="slct == 'true'">
+			and a.item_cd ~ (select '.*(' || array_to_string(array_agg(item_cd),'|') || ').*'
+							from web.category_dtl 
+							where tag_quantity >= quantity
+							and active_yn = 'Y')  -- 추가입고 필요항목만 보기
+		</if>
+		order by a.id desc
+	</select>
+	
+	<select id="getPartPresentList" parameterType="hashMap" resultType="com.cuppaHouse.vo.StockVo">
+		select cb.l_categy_nm
+				, cb.l_categy_cd
+				, cb.m_categy_nm
+				, cb.m_categy_cd
+				, ip.part_cd
+				, cd.item_nm 
+				, ip.part_quantity 
+				<choose>
+					<when test="needNum != null and needNum != ''">
+						, ip.part_quantity * #{needNum}::numeric as need_quantity
+						, case when ip.part_quantity * #{needNum}::numeric > cd.quantity then 'X' else 'O' end as item_state
+					</when>
+					<otherwise>
+						, 0 as need_quantity
+						, case when ip.part_quantity * 0 > cd.quantity then 'X' else 'O' end as item_state
+					</otherwise>
+				</choose>
+				, cd.quantity 
+		from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+							left join web.category_bas cb on cd.type_cd = cb.type_cd 
+														and cd.l_categy_cd = cb.l_categy_cd 
+														and cd.m_categy_cd = cb.m_categy_cd 
+		where ip.item_cd = #{itemCd}
+	</select>
+	
+	<select id="getStockDtl" parameterType="hashMap" resultType="com.cuppaHouse.vo.MngVo">
+	select to_char(cret_dt, 'YYYY-MM-DD') as cret_dt 
+			, prod_cd 
+			, part_cd 
+			, color_cd 
+			, prod_seq 
+			, barcode 
+			, case when sell_yn = 'Y' then 'O' else 'X' end as sell_yn
+	from web.item_barcode
+	where item_cd = #{itemCd}
+		
+	</select>
+	
+	<select id="getStockBarcodeList" parameterType="hashMap" resultType="MngVo">
+	select a.barcode
+		  , b.item_nm
+	from web.item_barcode a left join web.category_dtl b on a.item_cd = b.item_cd
+	where 1=1	
+	<if test="selectBarcode != null">
+	AND a.barcode in 
+		<foreach collection="selectBarcode" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</if>
+	order by a.cret_dt desc
+	</select>
+	
+	<select id="savePartExcelGridVal" parameterType="StockVo" resultType="StockVo">
+		select (select item_cd from web.category_dtl where item_cd = #{itemCd}) as item_cd
+			, cd.item_nm as part_nm
+			, cd.item_cd as part_cd
+		from web.category_dtl cd 
+		where cd.type_cd = '3'
+		and cd.item_cd not in (select distinct ip.part_cd
+								from web.item_part ip left join web.category_dtl cd on ip.item_cd = cd.item_cd 
+								where cd.type_cd = (select type_cd
+													from web.category_dtl
+													where item_cd = #{itemCd}))
+		and cd.item_cd = #{partCd}
+	</select>
+	
+	<insert id="savePartExcelGrid" parameterType="StockVo">
+	INSERT INTO web.item_part(
+		item_cd
+		, part_cd
+		, part_quantity
+		, cret_dt
+		, cret_id
+	)VALUES(
+		#{itemCd}
+		, #{partCd}
+		, #{partQuantity}
+		, now()
+		, #{cretId}
+	);
+	</insert>
+	
+	<select id="saveExcelGridVal" parameterType="StockVo" resultType="StockVo">
+		select #{itemCd} as id
+			, char_length('2002001001') as itemCdLen
+			, (select m_categy_cd
+				from web.category_bas
+				where m_categy_cd = substring(#{itemCd}, 1, 7)) as m_categy_cd
+			, (select item_cd
+				from web.category_dtl
+				where item_cd = #{itemCd}) as item_cd
+	</select>
+	
+	<insert id="saveExcelGrid" parameterType="StockVo">
+	INSERT INTO web.category_dtl (
+			type_cd
+			, l_categy_cd
+			, m_categy_cd
+			, item_cd
+			, item_nm
+			, unit
+			, "cost"
+			, sell_price
+			, tag_quantity
+			, active_yn
+			, cret_dt
+			, cret_id
+		) VALUES(
+			substring(#{itemCd}, 1,1)
+			,substring(#{itemCd}, 1,4)
+			,substring(#{itemCd}, 1,7)
+			,#{itemCd}
+			, #{itemNm}
+			, #{unit}
+			, #{cost}
+			, #{sellPrice}
+			, #{tagQuantity}
+			, true
+			, NOW()
+			, #{cretId}
+		);
+	</insert>
+	
+	
+	<select id="getTotalHomeCnt" resultType="hashMap">
+		select count(*) as proPrc
+				, coalesce(sum(prod_cnt),0) as proCnt
+		from web.process
+		where prc_end_dt is null 
+		and now() between prc_st_dt and prc_end_p_dt 
+	</select>
+	
+	<select id="getGroupSeq" resultType="Integer">
+		select max(cate_sar_group_seq)+1 as group_seq from web.category_dtl_sar
+	</select>
+	
+	<update id="resetHistory" parameterType="StockVo">
+		<choose>
+				<when test='classifiCd == "I"'>
+					--입고
+					update web.category_dtl AS a set
+						quantity = a.quantity - b.quantity
+					from (
+						select item_cd, sar_quantity as quantity from web.category_dtl_sar
+						where cate_sar_group_seq = #{groupSeq}::numeric
+					) AS b
+					where a.item_cd = b.item_cd
+				</when>
+				
+				<when test='classifiCd == "CI"'>
+					--반입
+					update web.category_dtl AS a set
+						quantity = a.quantity - b.quantity
+					from (
+						select item_cd, return_quantity as quantity from web.category_dtl_sar
+						where cate_sar_group_seq = #{groupSeq}::numeric
+					) AS b
+					where a.item_cd = b.item_cd
+				</when>
+				
+				
+				<when test='classifiCd == "O"'>
+					--출고
+					update web.category_dtl AS a set
+						quantity = a.quantity + b.quantity
+					from (
+						select item_cd, sar_quantity as quantity from web.category_dtl_sar
+						where cate_sar_group_seq = #{groupSeq}::numeric
+					) AS b
+					where a.item_cd = b.item_cd
+				</when>
+				
+				<when test='classifiCd == "CO"'>
+					--반출
+					update web.category_dtl AS a set
+						quantity = a.quantity + b.quantity
+					from (
+						select item_cd, return_quantity as quantity from web.category_dtl_sar
+						where cate_sar_group_seq = #{groupSeq}::numeric
+					) AS b
+					where a.item_cd = b.item_cd
+				</when>
+		</choose>
+	</update>
+	
+	<update id="updateAutoQuantity" parameterType="StockVo">
+		<choose>
+				<when test='classifiCd == "I"'>
+				-- 입고/반입(return_quantity) :  감소 판재, 파트 리스트 조회해서 해당 재고 마이너스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS a set
+					quantity = a.quantity - b.cnt 
+				from (
+					select *
+					from (
+						--파트입고 : 그룹시퀀스에 파트들로 만드는 판재 감소 (해당 판재를 구성하는 파트요소가 모두 입고되었을 경우에만 감소)
+						select a.item_cd, min(a.cnt) as cnt, 'm' as type
+						from (
+							select a.item_cd, a.part_quantity, b.sar_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.sar_quantity is null then -1 else trunc(b.sar_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '2'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--제품입고 : 그룹시퀀스에 제품을 구성하는 파트들 감소
+						select ip.part_cd as item_cd, cds.sar_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '4'
+					) a where a.cnt > 0
+				) AS b
+				where a.item_cd = b.item_cd
+				</when>
+				<when test='classifiCd == "CI"'>
+				-- 입고/반입(return_quantity) :  감소 판재, 파트 리스트 조회해서 해당 재고 마이너스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS a set
+					quantity = a.quantity - b.cnt 
+				from (
+					select *
+					from (
+						--파트입고 : 그룹시퀀스에 파트들로 만드는 판재 감소 (해당 판재를 구성하는 파트요소가 모두 입고되었을 경우에만 감소)
+						select a.item_cd, min(a.cnt) as cnt, 'm' as type
+						from (
+							select a.item_cd, a.part_quantity, b.return_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.return_quantity is null then -1 else trunc(b.return_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '2'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--제품입고 : 그룹시퀀스에 제품을 구성하는 파트들 감소
+						select ip.part_cd as item_cd, cds.return_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '4'
+					) a where a.cnt > 0
+				) AS b
+				where a.item_cd = b.item_cd
+				</when>
+				<when test='classifiCd == "O"'>
+				-- 출고/반출(return_quantity) :  증가 파트, 제품 리스트 조회해서 해당 재고 플러스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS bas set
+					quantity = bas.quantity + pm.cnt 
+				from (
+					--파트출고 : 그룹시퀀스에 파트들로 만드는 제품 증가
+					select *
+					from (
+						select a.item_cd, min(a.cnt) as cnt, 'p' as type
+						from (
+							select a.item_cd, a.part_quantity, b.sar_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.sar_quantity is null then -1 else trunc(b.sar_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '4'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--판재출고 : 그룹시퀀스에 판재를 구성하는 파트들 증가 
+						select ip.part_cd as item_cd, cds.sar_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '2'
+					) a where a.cnt > 0
+				) AS pm
+				where bas.item_cd = pm.item_cd
+				</when>
+				<when test='classifiCd == "CO"'>
+				-- 출고/반출(return_quantity) :  증가 파트, 제품 리스트 조회해서 해당 재고 플러스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS bas set
+					quantity = bas.quantity + pm.cnt 
+				from (
+					--파트출고 : 그룹시퀀스에 파트들로 만드는 제품 증가
+					select *
+					from (
+						select a.item_cd, min(a.cnt) as cnt, 'p' as type
+						from (
+							select a.item_cd, a.part_quantity, b.return_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.return_quantity is null then -1 else trunc(b.return_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '4'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--판재출고 : 그룹시퀀스에 판재를 구성하는 파트들 증가 
+						select ip.part_cd as item_cd, cds.return_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '2'
+					) a where a.cnt > 0
+				) AS pm
+				where bas.item_cd = pm.item_cd
+				</when>
+		</choose>
+	</update>
+	
+	<insert id="insertAutoQuantity" parameterType="StockVo">
+		<choose>
+				<when test='classifiCd == "I"'>
+				insert into web.category_dtl_sar_autoval
+				select #{groupSeq}, a.item_cd, a.cnt
+					from (
+						--파트입고 : 그룹시퀀스에 파트들로 만드는 판재 감소 (해당 판재를 구성하는 파트요소가 모두 입고되었을 경우에만 감소)
+						select a.item_cd, min(a.cnt) as cnt, 'm' as type
+						from (
+							select a.item_cd, a.part_quantity, b.sar_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.sar_quantity is null then -1 else trunc(b.sar_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '2'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--제품입고 : 그룹시퀀스에 제품을 구성하는 파트들 감소
+						select ip.part_cd as item_cd, cds.sar_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '4'
+					) a where a.cnt > 0
+				</when>
+				<when test='classifiCd == "CI"'>
+				insert into web.category_dtl_sar_autoval
+				select #{groupSeq}, a.item_cd, a.cnt
+					from (
+						--파트입고 : 그룹시퀀스에 파트들로 만드는 판재 감소 (해당 판재를 구성하는 파트요소가 모두 입고되었을 경우에만 감소)
+						select a.item_cd, min(a.cnt) as cnt, 'm' as type
+						from (
+							select a.item_cd, a.part_quantity, b.return_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.return_quantity is null then -1 else trunc(b.return_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '2'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--제품입고 : 그룹시퀀스에 제품을 구성하는 파트들 감소
+						select ip.part_cd as item_cd, cds.return_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '4'
+					) a where a.cnt > 0
+				</when>
+				<when test='classifiCd == "O"'>
+				insert into web.category_dtl_sar_autoval 
+				select #{groupSeq}, a.item_cd, a.cnt
+					from (
+						select a.item_cd, min(a.cnt) as cnt, 'p' as type
+						from (
+							select a.item_cd, a.part_quantity, b.sar_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.sar_quantity is null then -1 else trunc(b.sar_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '4'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--판재출고 : 그룹시퀀스에 판재를 구성하는 파트들 증가 
+						select ip.part_cd as item_cd, cds.sar_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '2'
+					) a where a.cnt > 0
+				
+				</when>
+				<when test='classifiCd == "CO"'>
+				insert into web.category_dtl_sar_autoval 
+				select #{groupSeq}, a.item_cd, a.cnt
+					from (
+						select a.item_cd, min(a.cnt) as cnt, 'p' as type
+						from (
+							select a.item_cd, a.part_quantity, b.return_quantity, b.return_quantity
+								,case when a.part_quantity = 0 or b.return_quantity is null then -1 else trunc(b.return_quantity/a.part_quantity, 0) end as cnt
+							from web.item_part a left join web.category_dtl_sar b on a.part_cd = b.item_cd and b.cate_sar_group_seq = #{groupSeq} and b.type_cd = '3'
+							where a.item_cd in (
+												select distinct ip.item_cd
+												from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.part_cd and substring(ip.item_cd, 1,1) = '4'
+												where cds.cate_sar_group_seq  = #{groupSeq}
+												and cds.type_cd = '3'
+												and ip.item_cd is not null
+							
+							)
+						) a 
+						group by a.item_cd
+						having min(a.cnt) > 0
+						
+						union all
+						
+						--판재출고 : 그룹시퀀스에 판재를 구성하는 파트들 증가 
+						select ip.part_cd as item_cd, cds.return_quantity*ip.part_quantity as cnt, 'm' as type
+						from web.category_dtl_sar cds left join web.item_part ip on cds.item_cd = ip.item_cd 
+						where cds.cate_sar_group_seq  = #{groupSeq}
+						and cds.type_cd = '2'
+					) a where a.cnt > 0
+				
+				</when>
+		</choose>
+	</insert>
+	
+	
+	<update id="resetHistoryAutoval" parameterType="hashMap">
+		<choose>
+				<when test='classifiCd == "I" or classifiCd == "CI"'>
+				-- 입고/반입(return_quantity) :  증가 판재, 파트 리스트 조회해서 해당 재고 플러스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS a set
+					quantity = a.quantity + b.quantity
+				from (
+					select * from web.category_dtl_sar_autoval
+					where cate_sar_group_seq = #{groupSeq}::numeric
+				) AS b
+				where a.item_cd = b.item_cd
+				</when>
+				
+				<when test='classifiCd == "O" or classifiCd == "CO"'>
+				-- 출고/반출(return_quantity) :  감소 파트, 제품 리스트 조회해서 해당 재고 마이너스 (소모품, 판재입고는 이력에만 저장. 재고 자동 변동 없음)
+				update web.category_dtl AS a set
+					quantity = a.quantity - b.quantity
+				from (
+					select * from web.category_dtl_sar_autoval
+					where cate_sar_group_seq = #{groupSeq}::numeric
+				) AS b
+				where a.item_cd = b.item_cd
+				</when>
+		</choose>
+	</update>
+	
+	
+	<delete id="deleteHistorySar" parameterType="hashMap">
+		delete from web.category_dtl_sar where cate_sar_group_seq = #{groupSeq}::numeric
+	</delete>
+	
+	<delete id="deleteHistorySarAuto" parameterType="hashMap">
+		delete from web.category_dtl_sar_autoval where cate_sar_group_seq = #{groupSeq}::numeric
+	</delete>
+	
+</mapper>

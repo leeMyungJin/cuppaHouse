@@ -1,0 +1,11 @@
+.table-users ul.total_1 li.total_1_sub,
+.table-users ul.comm_menu {
+	width:16%;
+	height:200px; /* �ߺз� �޴� ���� ����*/
+	position:relative;
+	background:#ffffff;
+	margin:10px 2% 0 2%;
+	border:0;
+	padding:0;
+	overflow:hidden;
+}

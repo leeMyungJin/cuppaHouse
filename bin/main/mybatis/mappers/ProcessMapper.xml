@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.ProcessMapper">
+
+	<select id="getProcessList" parameterType="hashMap" resultType="ProcessVo">
+		select * from (
+			SELECT p.process_seq
+				, to_char(p.cret_dt, 'YYYY-MM-DD') as cret_dt 
+				, p.bldg_cd
+				, b.bldg_nm 
+				, case when b.auth = 'mnFact' then '가공' else 
+					case when b.auth = 'finFact' then '마감' else '자사' end 
+				  end as prc_cd
+				, p.item_cd 
+				, cd.item_nm 
+				, to_char(p.prc_st_dt, 'YYYY-MM-DD') as prc_st_dt 
+				, to_char(p.prc_end_p_dt, 'YYYY-MM-DD') as prc_end_p_dt 
+				, to_char(p.done_st_dt, 'YYYY-MM-DD') as done_st_dt 
+				, to_char(p.done_end_dt, 'YYYY-MM-DD') as done_end_dt 
+				, p.prc_end_p_dt::date - now()::date as d_day
+				, case when done_end_dt is not null then 'G' else --완료
+						case when done_end_dt is null and now() between prc_st_dt and prc_end_p_dt then 'Y' else --진행중
+							case when done_end_dt is null and prc_end_p_dt <![CDATA[ < ]]>  now() then 'R' else 'Y' end  --지연 or 미도래 > 진행중
+						end 
+					end as prc_state
+				, p.prod_cnt
+				, p.memo
+				,(select case when sum(a.item_state) > 0 then 'N' else 'Y' end as in_yn
+					from (
+							select case when ip.part_quantity * p.prod_cnt::numeric > COALESCE(sip.sar_count,0) then 1 else 0 end as item_state
+							from web.item_part ip left join (
+															select bldg_cd, item_cd, sum(quantity) as sar_count
+															from app.item_in
+															where bldg_cd = p.bldg_cd
+															and cret_dt::timestamp between p.prc_st_dt and (p.prc_end_p_dt::date+1)::timestamp
+															group by bldg_cd, item_cd
+														) sip on ip.part_cd = sip.item_cd
+							where ip.item_cd = p.item_cd 
+					) a
+				) as in_yn
+				, p.faulty_yn
+				, p.faulty_cnt
+				, p.prc_memo
+			   	, p.cret_id
+			   	, to_char(p.updt_dt, 'YYYY-MM-DD') as updt_dt 
+			   	, p.updt_id
+			   	, p.done_faulty_yn
+				, p.done_faulty_cnt
+				, p.done_prc_memo
+			from web.process p left join web.category_dtl cd on p.item_cd = cd.item_cd 
+								left join web.bldg b on p.bldg_cd = b.bldg_cd
+		) a
+		where 1=1
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'bldgName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.bldg_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'process'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.prc_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdCode'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.bldg_nm LIKE '%' || #{item} || '%'
+						or a.prc_cd LIKE '%' || #{item} || '%'
+						or a.item_nm LIKE '%' || #{item} || '%'
+						or a.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="prcState != null and prcState != '' and prcState != 'all'">
+			and a.prc_state = #{prcState}
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and a.cret_dt::timestamp between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+		order by a.cret_dt desc
+	</select>	
+
+	<select id="getProcessTotal" resultType="hashMap">
+		select coalesce(sum(case when done_end_dt is not null then 1 else 0 end ),0) as finPrc
+				, coalesce(sum(case when done_end_dt is null and now() between prc_st_dt and prc_end_p_dt then 1 else 0 end ),0) as proPrc
+				, coalesce(sum(case when done_end_dt is null and prc_end_p_dt <![CDATA[ < ]]> now() then 1 else 0 end ),0) as delayPrc
+		from web.process
+	</select>	
+	
+	<select id="getProcessLable" resultType="hashMap">
+		select COALESCE(sum(a.faulty_cnt),0) as faultyCnt
+			,COALESCE(case when sum(a.prod_cnt) > 0 then round(sum(a.done_faulty_cnt)/sum(a.prod_cnt)*100, 0) else 0 end ,0) as faultyPersent
+		from (
+			select p.faulty_cnt
+				, p.done_faulty_cnt
+				, p.prod_cnt
+				, b.bldg_nm
+				, p.item_cd 
+				, cd.item_nm 
+				, case when b.auth = 'mnFact' then '가공' else 
+						case when b.auth = 'finFact' then '마감' else '자사' end 
+				  end as prc_cd
+				, case when done_end_dt is not null then 'G' else --완료
+						case when done_end_dt is null and now() between prc_st_dt and prc_end_p_dt then 'Y' else --진행중
+							case when done_end_dt is null and prc_end_p_dt <![CDATA[ < ]]>  now() then 'R' else 'Y' end  --지연 or 미도래 > 진행중
+						end 
+				end as prc_state
+				, to_char(p.cret_dt, 'YYYY-MM-DD') as cret_dt 
+			from web.process p left join web.category_dtl cd on p.item_cd = cd.item_cd 
+								left join web.bldg b on p.bldg_cd = b.bldg_cd
+		) a
+		where 1=1
+		<if test="inq != null">
+			AND 
+			<choose>
+				<when test="con == 'bldgName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.bldg_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'process'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.prc_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdName'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_nm LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<when test="con == 'pdCode'">
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</when>
+				<otherwise>
+					<foreach collection="inq" item="item"
+						index="index" open="(" close=")" separator="or">
+						a.bldg_nm LIKE '%' || #{item} || '%'
+						or a.prc_cd LIKE '%' || #{item} || '%'
+						or a.item_nm LIKE '%' || #{item} || '%'
+						or a.item_cd LIKE '%' || #{item} || '%'
+					</foreach>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="prcState != null and prcState != '' and prcState != 'all'">
+			and a.prc_state = #{prcState}
+		</if>
+		<if test="fromDate != null and toDate != null">
+			and a.cret_dt::timestamp between #{fromDate}::timestamp and (to_date(#{toDate}, 'YYYY-MM-DD')+1)::timestamp
+		</if>
+	</select>	
+
+	<update id="saveProcessGrid" parameterType="hashMap">
+		update web.process set
+			done_end_dt = #{doneEndDt}::timestamp
+			,done_st_dt = #{doneStDt}::timestamp
+			, memo = #{memo}
+			, faulty_yn = #{faultyYn}
+			, faulty_cnt = #{faultyCnt}
+			, done_faulty_yn = #{doneFaultyYn}
+			, done_faulty_cnt = #{doneFaultyCnt}
+			, updt_dt = NOW()
+			, updt_id = #{updtId}
+		where process_seq = #{processSeq}::numeric
+	</update>
+	
+	<insert id="saveProcess" parameterType="hashMap">
+		INSERT INTO web.process (
+			bldg_cd
+			, item_cd
+			, prc_st_dt
+			, prc_end_p_dt
+			, prod_cnt
+			, memo
+			, cret_dt
+			, cret_id
+		)VALUES(
+			#{bldgCd}
+			, #{itemCd}
+			, #{prcStDt}::timestamp
+			, #{prcEndPDt}::timestamp
+			, #{prodCnt}::numeric
+			, #{memo}
+			, NOW()
+			, #{cretId}
+		);
+
+	</insert>
+	
+	<delete id="deleteProcess" parameterType="hashMap">
+		delete from web.process
+		where process_seq = #{processSeq}::numeric
+	</delete>
+	
+	<update id="updateProcess" parameterType="hashMap">
+		update web.process set
+			bldg_cd = #{bldgCd}
+			,item_cd = #{itemCd}
+			,prc_st_dt = #{prcStDt}::timestamp
+			,prc_end_p_dt = #{prcEndPDt}::timestamp
+			,prod_cnt = #{prodCnt}::numeric
+			,memo = #{memo}
+			,updt_dt = NOW()
+			,updt_id = #{updtId}
+		where process_seq = #{processSeq}::numeric
+	</update>
+	
+	
+	
+	<select id="getNeedMaterList" parameterType="hashMap" resultType="ProcessVo">
+	select cb.l_categy_nm
+			, cb.l_categy_cd
+			, cb.m_categy_nm
+			, cb.m_categy_cd
+			, ip.part_cd
+			, cd.item_nm 
+			, ip.part_quantity 
+			, ip.part_quantity * #{prodCnt}::numeric as need_quantity
+			, COALESCE(sip.sar_count,0) as sar_count
+			, case when ip.part_quantity * #{prodCnt}::numeric <![CDATA[ > ]]> COALESCE(sip.sar_count,0) then 'X' else 'O' end as item_state
+			, cd.quantity 
+	from web.item_part ip left join web.category_dtl cd on ip.part_cd = cd.item_cd 
+						left join web.category_bas cb on cd.type_cd = cb.type_cd 
+													and cd.l_categy_cd = cb.l_categy_cd 
+													and cd.m_categy_cd = cb.m_categy_cd 
+						left join (
+							select bldg_cd, item_cd, sum(quantity) as sar_count
+							from app.item_in
+							where process_seq = #{processSeq}::numeric
+							group by bldg_cd, item_cd
+						) sip on ip.part_cd = sip.item_cd
+	where ip.item_cd = #{itemCd}
+	</select>
+	
+	
+	<select id="getShowImgPop" parameterType="hashMap" resultType="ProcessVo">
+		<choose>
+			<when test="type == 'start'">
+				select process_seq
+					, img_path
+				from web.process
+				where process_seq = #{processSeq}::numeric
+			</when>
+			<when test="type == 'done'">
+				select process_seq
+					, done_img_path as img_path
+				from web.process
+				where process_seq = #{processSeq}::numeric
+			</when>
+		</choose>
+	</select>
+	
+</mapper>

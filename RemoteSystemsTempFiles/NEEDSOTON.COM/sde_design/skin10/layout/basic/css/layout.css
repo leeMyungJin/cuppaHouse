@@ -1,0 +1,312 @@
+@charset "utf-8";
+
+/******************    우측일때 반드시 필요한 CSS       *************************/
+#right_fixed.right {	position: fixed;	/*display: none;*/	z-index: 9999;	width: 185px;	height: 100%;	right: 0;	top: 0;	background: url('/web/upload/good_images/right_fixed_bg.png') }
+#right_fixed.right .toggle {	  position: absolute;	  top: 348px;	  left: -33px;	  width: 35px;	  height: 44px;	  background: url('/web/upload/good_images/left_ov.png') no-repeat 50% 50% ; cursor:pointer;}
+#right_fixed.right .toggle2 {	  position: absolute;	  top: 392px;	  left: -33px;	  width: 35px;	  height: 43px;	  background: url('/web/upload/good_images/bt_top.png') no-repeat 50% 50% ; cursor:pointer;}
+#right_fixed.right .toggle3 {	  position: absolute;	  top: 435px;	  left: -33px;	  width: 35px;	  height: 43px;	  background: url('/web/upload/good_images/bt_bm.png') no-repeat 50% 50% ; cursor:pointer;}
+
+#right_fixed.right .toggle.off {	position: absolute;	  top: 348px;	  left: -33px;	  width: 35px;	  height: 44px;	  background: url('/web/upload/good_images/left.png') no-repeat 50% 50% ; cursor:pointer; }
+#right_fixed.right .toggle2.off {	position: absolute;	  top: 392px;	  left: -33px;	  width: 35px;	  height: 43px;	  background: url('/web/upload/good_images/bt_top.png') no-repeat 50% 50% ; cursor:pointer;}
+#right_fixed.right .toggle3.off {	position: absolute;	  top: 435px;	  left: -33px;	  width: 35px;	  height: 43px;	  background: url('/web/upload/good_images/bt_bm.png') no-repeat 50% 50% ; cursor:pointer;}
+
+
+#right_fixed.right .sidebody {width:100%;height:100%;}
+
+#right_fixed.right .position1 {  position: relative; margin:70px 0 0 0; }
+#right_fixed.right .position1 ul {float:left;position: relative; width:100%;height:auto;list-style-type: none;left:0px; padding-left:0px;}
+#right_fixed.right .position1 ul li {float:left;position: relative; width:100%; line-height:25px; left:0px;margin-left:0px;;}
+#right_fixed.right .position1 ul li a {display: block;  line-height: 30px;  text-align: left;  font-family: 'malgun gothic';  font-size: 11px;  color: #555;}
+
+#right_fixed.right .fixed_login_area { width:159px; margin:0 0 0 15px;  }
+#right_fixed.right .fixed_login_title {   margin:0 0 0 0; text-align:center; }
+#right_fixed.right .fixed_login { width:159px; margin:0 0 0 0;  }
+
+
+#right_fixed.right .fixed_find_area { width:159px;height:29px;  margin:3px 0 7px 0;  }
+#right_fixed.right .fixed_find_bt_01 { width:79px; margin:0 1px 0 0;  float:left;}
+#right_fixed.right .fixed_find_bt_01:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#right_fixed.right .fixed_find_bt_02 { width:79px; margin:0 0 0 0;  float:left;}
+#right_fixed.right .fixed_find_bt_02:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+
+
+#right_fixed.right .member { width:159px; margin:5px 0 5px 0;  text-align:center; line-height:24px;}
+
+#right_fixed.right .membership { margin:5px 0 7px 0; border:1px solid #e2e2e2; }
+#right_fixed.right .membership li { margin:0 0 0 0; padding:0 0 0 0; text-align:center;  line-height:24px;}
+#right_fixed.right .membership li a { color:#508bed; }
+
+#right_fixed.right .fixed_logout_area { width:159px; height:29px; margin:5px 0 0 0;  }
+#right_fixed.right .fixed_logout_bt_01 { width:78px; margin:0 0 0 0;  float:left;}
+#right_fixed.right .fixed_logout_bt_01:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#right_fixed.right .fixed_logout_bt_02 { width:78px; margin:0 0 0 0;  float:left;}
+#right_fixed.right .fixed_logout_bt_02:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+
+
+#right_fixed.right .fixed_tok_area { width:159px; margin:0 0 0 15px; text-align:center;}
+#right_fixed.right .fixed_tok_01 { width:159px; margin:0 0 0 0;  }
+#right_fixed.right .fixed_tok_01 a:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#right_fixed.right .fixed_tok_02 { width:159px; margin:5px 0 0 0;  }
+#right_fixed.right .fixed_tok_02 a:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+
+#right_fixed.right .fixed_comm_area { width:159px; margin:20px 0 0 15px; text-align:center;}
+#right_fixed.right .fixed_comm_title {   margin:0 0 10px 0; text-align:center; }
+#right_fixed.right .fixed_comm { width:159px; margin:0 0 0 0;  }
+#right_fixed.right .fixed_comm_01 { width:159px; margin:0 0 0 0;  }
+#right_fixed.right .fixed_comm_02 { width:159px; margin:0 0 0 0;  }
+#right_fixed.right .fixed_comm_03 { width:159px; margin:0 0 0 0;  }
+
+#right_fixed.right .fixed_callcenter_area { width:159px; margin:20px 0 0 15px;  }
+
+#right_fixed.right .fixed_callcenter { width:159px; margin:0 0 0 0;  }
+#right_fixed.right .fixed_callcenter_title { font-size:12px; color:#2e2e2e; margin:10px 0 0 0;   }
+#right_fixed.right .fixed_callcenter_number { font-size:16px; color:#2e2e2e; font-weight:bold; line-height:30px;  }
+#right_fixed.right .fixed_callcenter_infor { font-size:9px;     color:#9b9b9b; line-height:14px; word-spacing:-1px;}
+
+#right_fixed.right .fixed_banking_area { width:159px; margin:20px 0 0 18px;  }
+#right_fixed.right .fixed_banking { width:159px; margin:0 0 0 0;   }
+#right_fixed.right .fixed_banking_title { font-size:12px; color:#2e2e2e; margin:10px 0 10px 0;   }
+#right_fixed.right .fixed_banking_number {  width:159px; margin:0 0 0 0;  }
+#right_fixed.right .ixed_bank_name { font-size:12px; color:#2e2e2e;   line-height:20px; }
+#right_fixed.right .fixed_bank_number { font-size:14px; color:#2e2e2e;   font-weight:bold;  line-height:30px; }
+#right_fixed.right .fixed_bank_acc { font-size:12px; color:#2e2e2e;   line-height:20px; }
+
+/******************    우측일때 반드시 필요한 CSS       *************************/
+
+
+
+/******************    좌측일때 반드시 필요한 CSS       *************************/
+#left_fixed.left {	position: fixed;	/*display: none;*/	z-index: 99;	width: 232px;	left: 0;	top: 216px;	background-color:#f6f6f6; border-top:1px solid #eaebeb;}
+ #left_fixed.left .fixed_cate_area { width:200px; margin:15px 0 15px 16px; float:left; }
+#left_fixed.left .fixed_cate_title {  width:200px; border-top:1px solid #dcb5c1; border-bottom:1px solid #111111;margin:0 0 0 0; float:left;  }
+#left_fixed.left .fixed_cate {  width:200px;  margin:3px 0 0 0; float:left;  background-color:#e4e4e4; }
+
+ 
+/******************    좌측일때 반드시 필요한 CSS       *************************/
+
+
+/* Layout */
+#header { background:url("/web/upload/good_images/top_bg.gif") repeat-x 0 0; height:196px;}
+#header .inner { position:relative; width:1200px; margin:0 auto; *zoom:1; }
+#header .inner:after { content:""; display:block; clear:both; }
+
+#header .top_login_area { width:1200px; margin:0 0 0 0; float:left; z-index:999999; }
+
+#header .left_icon_area { width:300px; margin:10px 0 0 4px; float:left; }
+
+#header .top_login_right_area { width:800px; padding:4px 0 0 0; float:right; text-align:right; line-height:37px; color:#545454; font-size:9pt; }
+#header .top_login_right_area a{ color:#545454;}
+#header .top_login_right_area a:hover{ color:#000000;}
+
+.tooltipTarget { position:relative; }
+.icoTooltip { z-index:1; position:absolute; top:120%; left:-5px; }
+
+ 
+#header .top_logo_total_area  { width:1200px; margin:1px 0 0 0; float:left;  }
+ 
+#header .top_total_menu_area { width:200px; margin:40px 0 0 0; float:left; z-index:99999;}
+ 
+#header  .top_logo_area { width:800px;   margin:0 0 0 0; float:left; }
+#header  .top_logo { width:800px;   margin:0 0 0 0; float:left; }
+#header  .top_logo_callcenter { width:800px;   margin:0 0 0 0; float:left; }
+
+#header .top_search_area { width:200px; margin:0 0 0 0; float:right;   }
+ 
+  
+#main_flash_total {   width:100%;  height:550px; position:relative;  }
+
+#main_flash_wrap {  position:absolute; width:100%; height:550px; text-align:center;   }
+ 
+ 
+ 
+
+#wrap { position:relative; width:1420px; margin:20px auto 0; }
+#container { width:1200px; margin:0 auto; *zoom:1; }
+#container:after { content:""; display:block; clear:both; }
+
+#container .main_top_banner_area { width:1200px; margin:0 0 0 0; float:left; }
+#container .main_top_banner01 { width:296px; margin:0 5px 0 0; float:left; }
+#container .main_top_banner01:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#container .main_top_banner02 {	width:296px; margin:0 5px 0 0; float:left; }
+#container .main_top_banner02:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#container .main_top_banner03 { width:296px; margin:0 6px 0 0; float:left; }
+#container .main_top_banner03:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+#container .main_top_banner04 { width:296px; margin:0 0 0 0; float:left; }
+#container .main_top_banner04:hover { filter:alpha(opacity=30); opacity:0.5; transition:opacity 0.5s; -webkit-transition:opacity 0.5s; -moz-transition:opacity 0.5s; -o-transition:opacity 0.5s;}
+
+#container .best_seller_tap_star { text-align:center; width:1200px; margin:0 0 5px 0; }
+#container .best_seller_tap_star img.star { 
+ animation: target_image 2s; 
+ animation-iteration-count: infinite;
+ transform-origin: 50% 0%;  /* 별 고정위치 */
+ }
+@keyframes target_image { /* 별 움직이는 각도 */
+ 0% { transform: rotate(-20deg); }  
+ 50% { transform: rotate(20deg) }
+ 100% { transform: rotate(-20deg); }
+}
+
+
+
+
+#container .best_seller_tap_area { float:left; width:1200px; margin:40px 0 0 0; }
+#container .best_seller_tap_title { float:left; width:1200px; margin:0 0 0 0; }
+#container .best_seller_tap { float:left; width:1200px; margin:0 0 0 0; }
+
+
+#weekly_best_wrap { background:url("/web/upload/good_images/weekly_best_bg.gif"); height:auto; }
+#weekly_best_wrap .weekly_best_total_area { position:relative; width:1200px; margin:0 auto ; }
+
+#weekly_best_wrap .weekly_best_star { text-align:center; width:1200px; margin:0; padding:20px 0 5px 0; }
+#weekly_best_wrap .weekly_best_star img.star { 
+ animation: target_image 2s; 
+ animation-iteration-count: infinite;
+ transform-origin: 50% 0%;  /* 별 고정위치 */
+ }
+@keyframes target_image { /* 별 움직이는 각도 */
+ 0% { transform: rotate(-20deg); }  
+ 50% { transform: rotate(20deg) }
+ 100% { transform: rotate(-20deg); }
+}
+#main_photo_wrap .main_photo_review_title { float:left; width:1200px; margin:20px 0 20px 0;}
+#main_photo_wrap .weekly_best_area { float:left; width:1200px; margin:0 0 0 0; }
+
+#weekly_best_wrap .icon_01  { position:absolute; z-index:999999;  margin:8px 0 0 6px;   }
+#weekly_best_wrap .icon_02  { position:absolute; z-index:999999; margin:8px 0 0 6px;     }
+#weekly_best_wrap .icon_03  { position:absolute; z-index:999999; margin:8px 0 0 6px;     }
+#weekly_best_wrap .icon_04  { position:absolute; z-index:999999;  margin:8px 0 0 6px;    }
+#weekly_best_wrap .icon_05  { position:absolute; z-index:999999;  margin:8px 0 0 6px;    }
+#weekly_best_wrap .icon_06  { position:absolute; z-index:999999;  margin:8px 0 0 6px;    }
+#weekly_best_wrap .icon_07  { position:absolute; z-index:999999;  margin:8px 0 0 6px;    }
+#weekly_best_wrap .icon_08  { position:absolute; z-index:999999;  margin:8px 0 0 6px;    }
+ 
+
+#main_more_wrap { height:100%; }
+#main_more_wrap .main_more_total_area { position:relative; width:1200px; margin:0 auto;margin-bottom:30px; }
+
+#main_more_wrap .event_item_area { width:1200px; margin:20px 0 50px 0; float:left;}
+#main_more_wrap .event_item_title { width:1200px; margin:0 0 0 0; float:left;}
+#main_more_wrap .event_item { width:1200px; margin:0 0 0 0; float:left;}
+
+#main_more_wrap .main_special_total_area { width:1200px; margin:20px 0 0 0; float:left;}
+#main_more_wrap .special_item_star { text-align:center; width:1200px; margin:0 0  0 0; padding:20px 0 5px 0; }
+#main_more_wrap .special_item_star img.star { 
+ animation: target_image 2s; 
+ animation-iteration-count: infinite;
+ transform-origin: 50% 0%;  /* 별 고정위치 */
+ }
+@keyframes target_image { /* 별 움직이는 각도 */
+ 0% { transform: rotate(-20deg); }  
+ 50% { transform: rotate(20deg) }
+ 100% { transform: rotate(-20deg); }
+}
+#main_more_wrap .special_item_title { float:left; width:1200px; margin:0 0 20px 0; }
+#main_more_wrap .special_item_area { float:left; width:1200px; margin:0 0 0 0; }
+
+
+#main_photo_wrap { background:url("/web/upload/good_images/main_photo_bg.gif"); height:auto; }
+#main_photo_wrap .weekly_best_total_area { position:relative; width:1200px; margin:0 auto ; }
+#main_photo_wrap .main_photo_review_area { width:1200px; margin:20px 0 0 0; float:left;}
+#main_more_wrap .special_item_star { text-align:center; width:1200px; margin:0 0  0 0; padding:20px 0 5px 0; }
+#main_more_wrap .special_item_star img.star { 
+ animation: target_image 2s; 
+ animation-iteration-count: infinite;
+ transform-origin: 50% 0%;  /* 별 고정위치 */
+ }
+@keyframes target_image { /* 별 움직이는 각도 */
+ 0% { transform: rotate(-20deg); }  
+ 50% { transform: rotate(20deg) }
+ 100% { transform: rotate(-20deg); }
+}
+#main_more_wrap .special_item_title { float:left; width:1200px; margin:0 0 20px 0; }
+#main_more_wrap .special_item_area { float:left; width:1200px; margin:0 0 0 0; }
+
+
+
+
+#contents { float:right; width:1200px; }
+#contents .visual img { max-width:100%; }
+
+#banner { position:absolute; top:0; left:0; width:90px;   }
+ 
+#quick { position:absolute; top:0; right:0; width:90px; }
+#quick .banner a { display:block; margin:15px 0 0; }
+
+#footer { background:url("/web/upload/good_images/bm_bg.gif"); height:471px; height:auto; margin:0px auto; padding:0px; clear:both;  }
+#footer .inner { overflow:hidden; position:relative; width:1200px; margin:40px auto 0; *zoom:1; }
+
+#footer .instar_area { float:left; width:1200px; margin:0 0 0 0;  }
+#footer .instar_title { float:left; width:1200px; margin:0 0 0 0;  }
+#footer .instar { float:left; width:1200px; margin:0 0 0 0;   }
+#footer .instar_link {position:absolute; float:left; width:1200px; height:345px; margin:0 0 0 0; z-index:999999; }
+
+#footer .bm_copy_area { float:left; width:1200px; margin:40px 0 0 0; height:164px; }
+
+#footer .bm_callcenter_area { float:left; width:253px; margin:0 0 0 0; }
+#footer .bm_callcenter_title { float:left; width:253px; margin:0 0 0 0; }
+#footer .bm_callcenter_number { width:195px;  font-size:19px; color:#2e2e2e; font-weight:bold; line-height:34px; padding:0 0 0 9px;}
+#footer .bm_callcenter_infor { font-size:11px;   line-height:20px; text-decoration:underline; color:#9b9b9b;   padding:5px 0 0 9px;}
+
+#footer .bm_banking_area {  float:left; width:242px; margin:0 0 0 0;  }
+#footer .bm_banking { float:left; width:242px; margin:0 0 0 0; }
+#footer .bm_banking_title { float:left; width:242px; margin:0 0 0 0; }
+#footer .bm_banking_number { width:242px; margin:0 0 0 9px;  }
+#footer .bm_bank_number {  font-size:18px; color:#2e2e2e; font-weight:bold; line-height:34px; }
+#footer .bm_bank_acc { font-size:11px;   line-height:20px;  color:#353535; padding:5px 0 0 0; }
+#footer .bm_banking_infor { font-size:11px; color:#9b9b9b;   line-height:20px;   padding:0 0 0 9px;}
+
+#footer .bm_copy { width:580px; margin:10px 0 0 0; float:left; }
+ 
+#footer .bm_menu_area { width:125px; margin:10px 0 0 0; float:left; }
+#footer .bm_menu_area a {  font-size:12px; color:#898989;   line-height:24px; }
+#footer .bm_menu_area a:hover { font-size:12px; color:#000000;   line-height:24px; font-weight:bold;  }
+ 
+#footer .bm_pay_area { float:left; width:1200px; margin:0 0 0 0; }
+
+/* Main */
+#boardArea { overflow:hidden; margin:50px 0 0; border-top:1px solid #d8d8d8; }
+#bannerArea { margin:22px 0 0; }
+#bannerArea h2 { margin:0 0 16px; font-weight:normal; font-size:20px; color:#2e2e2e; text-align:center; }
+
+/* 탐색경로바 */
+.path { overflow:hidden; height:30px; line-height:30px; *zoom:1; }
+.path span { overflow:hidden; position:absolute; width:0; height:0; white-space:nowrap; text-indent:100%; }
+.path ol { float:right; }
+.path li { float:left; padding:0 0 0 12px; margin:0 0 0 8px; color:#757575; background:url("//img.echosting.cafe24.com/skin/base/layout/ico_path.gif") no-repeat 0 10px; }
+.path li:first-child { background:none; }
+.path li a { color:#757575; }
+.path li strong,
+.path li strong a { color:#2e2e2e; }
+
+/* 타이틀 */
+.titleArea { min-height:30px; margin:0 0 0 0 ; text-align:center;   }
+.titleArea h2 { display:inline-block; padding:20px 0 20px 0; color:#2e2e2e; font-size:16px; *display:inline; *zoom:1; }
+.titleArea p { text-align:center; margin:0 0 20px 0;}
+.titleArea ul { padding:5px 0; color:#939393; line-height:18px; }
+.titleArea ul li { padding:0 0 0 9px; background:url("http://img.echosting.cafe24.com/skin/base_ko_KR/common/ico_info.gif") no-repeat 4px 7px; }
+
+/* 게시판 메인 */
+.boardMain { overflow:hidden; *zoom:1; }
+.boardMain td img { vertical-align:middle; margin:1px; }
+.boardMain .board { position:relative; margin:0 0 65px; }
+.boardMain .leftArea { float:left; width:50%; }
+.boardMain .leftArea .board { margin:0 23px 65px 0; }
+.boardMain .rightArea { float:right; width:50%; }
+.boardMain .rightArea .board { margin:0 0 65px 23px; }
+.boardMain .board h3 { margin:0 0 13px; height:28px; font-size:16px; color:#2e2e2e; border-bottom:2px solid #626672; }
+.boardMain .board .more { position:absolute; top:0; right:0; padding:2px; }
+.boardMain .board .ec-base-table.typeList td { color:#a4a4a4; }
+.boardMain .board .ec-base-table.typeList td.title a,
+.boardMain .board .ec-base-table.typeList td.title a:hover { color:#4f4f4f; }
+.boardMain .board .galleryList { overflow:hidden; }
+.boardMain .board .galleryList ul { overflow:hidden; margin:0 -10px; }
+.boardMain .board .galleryList li { float:left; position:relative; width:20%; padding:0 0 12px 0; word-break:break-all; }
+.boardMain .board .galleryList li span { display:block; margin:0 10px; font-size:11px; color:#a4a4a4; }
+.boardMain .board .galleryList li .imgLink,
+.boardMain .board .galleryList li .imgLink:hover { display:block; margin:0 10px 5px; font-size:12px; }
+.boardMain .board .galleryList li .imgLink img { width:100%; max-height:110px; border:1px solid #ededed; }
+
+/* 퀵뷰 모달 */
+#modalBackpanel { display:none; position:absolute; top:0; left:0; z-index:10000; width:100%; height:100%; background:#000; }
+#modalContainer { display:none; position:absolute; top:100px; left:100px; z-index:10001; width:975px; height:720px; border:1px solid #333; background:#fff; }
+#modalContainer #modalContent { width:100%; height:100%; }

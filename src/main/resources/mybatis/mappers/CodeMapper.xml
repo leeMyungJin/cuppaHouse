@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cuppaHouse.Mappers.CodeMapper">
+
+	<select id="getCodeList" parameterType="hashMap" resultType="CodeVo">
+		select code_dtl_cd as cd, code_dtl_nm as nm
+		from web.code
+		where code_cd = #{cd}
+	</select>
+
+</mapper>

@@ -1,0 +1,7 @@
+@charset "utf-8";
+
+#outpage{width:1200px;margin:0 auto;margin-top:30px;}
+#outpage img{display:block;}
+
+
+#outpage .brand_bg01{width:100%;background:url('/web/upload/good_images/brand_img01_bg.jpg') no-repeat;}
