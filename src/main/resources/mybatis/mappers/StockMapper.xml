@@ -714,7 +714,7 @@
 	select coalesce(sum(case when tag_quantity >= quantity then 1 else 0 end),0) as inNeedItemCnt
 		,coalesce(sum(case when type_cd = '2' then "cost" * quantity else 0 end),0) as woodStockAmt
 		,coalesce(sum(case when type_cd = '4' then "cost" * quantity else 0 end),0) as prodStockAmt
-		,coalesce(sum(case when type_cd = '4' then "cost" * sell_price else 0 end),0) as exProdSales
+		,coalesce(sum(case when type_cd = '4' then sell_price * quantity else 0 end),0) as exProdSales
 	from web.category_dtl 
 	where active_yn = 'Y'
 	</select>

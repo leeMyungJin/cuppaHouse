@@ -72,9 +72,10 @@ function loadGridList(type, result){
 			    return validItem.map(itemCd => itemCd.name);
 			};
 			
+			let validItemList;
 			itemList.getDisplayValues = function (dataItem) {
-			    let validItem = getItemDtl().filter(itemCd => itemCd.mCategyCd == dataItem.mCategyCd || itemCd.lCategyCd == dataItem.lCategyCd || itemCd.typeCd == dataItem.typeCd);
-			    return validItem.map(itemCd => itemCd.name);
+				validItemList = getItemDtl().filter(itemCd => itemCd.mCategyCd == dataItem.mCategyCd);
+			    return validItemList.map(itemCd => itemCd.name);
 			};
 			
 		   entryColumns = [
@@ -175,7 +176,7 @@ function loadGridList(type, result){
 	                	e.getRow().dataItem.quantityCnt = 0;
 	                	
 	                }if (col.binding == 'itemCd') {
-		                var item = getItemDtl().filter(item => item.name == value);
+		                var item = validItemList;
 		                if(item.length > 0){
 		                	s.setCellData(e.row, 'cost', Number(item[0].cost));
 			                s.setCellData(e.row, 'quantity', Number(item[0].quantity));
